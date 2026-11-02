@@ -246,7 +246,7 @@
       for (const it of items) {
         const a = document.createElement('a');
         a.className = 'card';
-        a.href = it.href.replace('https://github.com/OWNER/trama', owner ? repo : '..').replace('../blob/main/', '../').replace('../tree/main/', '../');
+        a.href = it.href.replace('https://github.com/camimonteiro/trama', owner ? repo : '..').replace('../blob/main/', '../').replace('../tree/main/', '../');
         const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = labels[it.type] || it.type;
         const h = document.createElement('h3'); h.textContent = it.title;
         const p = document.createElement('p'); p.textContent = it.description;

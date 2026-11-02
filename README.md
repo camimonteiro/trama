@@ -9,12 +9,12 @@ Projeto final do curso **Salto** (Aprender Design). Contexto, prazos e requisito
 ## Time
 | Pessoa | Papel | GitHub |
 |---|---|---|
-| Camille Monteiro | Product designer | _a confirmar_ |
+| Camille Monteiro | Product designer | [`camimonteiro`](https://github.com/camimonteiro) |
 | Lucas Sampaio | Product designer | [`sampaio-lucas`](https://github.com/sampaio-lucas) |
 | Danilo Campos | Mentor | _pendente_ ([OQ-002](management/open-questions.md)) |
 
 ## Links
-- **Hub do projeto (GitHub Pages):** `https://<usuario>.github.io/trama/`
+- **Hub do projeto (GitHub Pages):** `https://camimonteiro.github.io/trama/`
 - **Deck de onboarding:** `/trama/decks/onboarding/`
 - **Produto:** `/trama/app/`
 

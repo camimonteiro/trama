@@ -6,7 +6,7 @@
 - **Origem:** planejamento inicial
 
 ## Decisão
-Repositório **público** na conta pessoal da Camille, **sem arquivo de licença** por enquanto.
+Repositório **público** na conta pessoal da Camille (`camimonteiro/trama`, Pages em https://camimonteiro.github.io/trama/), **sem arquivo de licença** por enquanto.
 
 ## Embasamento
 - Sem licença, valem os direitos autorais padrão: outras pessoas podem ver, mas não reutilizar. https://choosealicense.com/no-permission/
