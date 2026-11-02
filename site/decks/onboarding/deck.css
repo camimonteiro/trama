@@ -23,6 +23,10 @@ h1, h2 { font-family: var(--font-display); letter-spacing: -0.02em; line-height:
 h1 { font-size: clamp(2.6rem, 8vw, 5.5rem); max-width: 14ch; }
 h2 { font-size: clamp(1.9rem, 5vw, 3.4rem); max-width: 22ch; }
 h1 em, h2 em { color: var(--color-accent-text); font-style: italic; }
+/* SplitText word masks clip at the line box; with line-height 1.05 that cuts
+   descenders, accents and italic overhang. Grow the clip area, cancel it in layout.
+   The entrance offset in deck.js (yPercent 150) must stay larger than this padding. */
+.word-mask { padding: .14em .12em .26em; margin: -.14em -.12em -.26em; }
 .lead { font-size: clamp(1rem, 2vw, 1.3rem); color: var(--color-text-muted); max-width: 58ch; margin: 0 0 var(--space-6); }
 .cols { display: grid; gap: var(--space-4); }
 @media (min-width: 760px) { .cols.c2 { grid-template-columns: 1fr 1fr; } .cols.c3 { grid-template-columns: repeat(3, 1fr); } .cols.c4 { grid-template-columns: repeat(4, 1fr); } }
