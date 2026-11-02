@@ -33,5 +33,12 @@
     "date": "2026-11-02",
     "href": "https://github.com/camimonteiro/trama/blob/main/design/identity/references.md",
     "description": "Referências, tokens e racional da identidade em terracota."
+  },
+  {
+    "title": "Cronograma e orientações do Salto",
+    "type": "decision",
+    "date": "2026-11-02",
+    "href": "https://github.com/camimonteiro/trama/blob/main/management/decisions/ADR-0010-project-schedule.md",
+    "description": "Marcos até a entrega final de 24/04/2027 e resumo das orientações do curso para o projeto final."
   }
 ]
