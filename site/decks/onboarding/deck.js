@@ -124,7 +124,8 @@ function go(n) {
   if (heading) {
     gsap.set(heading, { autoAlpha: 1, x: 0 });
     if (split && !RM) {
-      tl.fromTo(split.words, { yPercent: dir * 110 }, { yPercent: 0, duration: 0.9, stagger: 0.05 }, enterAt);
+      // 150% clears the padded .word-mask in deck.css; raise both together
+      tl.fromTo(split.words, { yPercent: dir * 150 }, { yPercent: 0, duration: 0.9, stagger: 0.05 }, enterAt);
     } else {
       tl.fromTo(heading, { autoAlpha: 0 }, { autoAlpha: 1, duration: dur(0.6) }, enterAt);
     }
@@ -237,7 +238,7 @@ function start() {
   if (!RM) {
     slides.forEach((s) => {
       const h = s.querySelector('h1, h2');
-      if (h) splits.set(s, SplitText.create(h, { type: 'words', mask: 'words' }));
+      if (h) splits.set(s, SplitText.create(h, { type: 'words', mask: 'words', wordsClass: 'word' }));
     });
   }
   const n = parseInt(location.hash.replace('#/', ''), 10) - 1;
