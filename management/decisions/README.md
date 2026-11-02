@@ -21,7 +21,6 @@ Use o [`_template.md`](_template.md). Toda decisão costuma nascer de uma [quest
 | [ADR-0008](ADR-0008-admin-merge-bypass.md) | Admin pode fazer merge de PR sem aprovação | aceita |
 | [ADR-0009](ADR-0009-issue-and-pr-title-pattern.md) | Padrão de título de issues e PRs | aceita |
 | [ADR-0010](ADR-0010-project-schedule.md) | Cronograma do projeto e marcos até a entrega de 24/04/2027 | aceita |
-| [ADR-0008](ADR-0008-admin-merge-bypass.md) | Admin pode fazer merge de PR sem aprovação | aceita |
 | [DDR-0001](DDR-0001-temporary-name.md) | Nome temporário: Trama | aceita |
 | [DDR-0002](DDR-0002-provisional-visual-identity.md) | Identidade visual provisória (terracota) | aceita |
 | [DDR-0003](DDR-0003-decks-html-gsap.md) | Decks em HTML + GSAP em `site/decks/<name>/` | aceita |
