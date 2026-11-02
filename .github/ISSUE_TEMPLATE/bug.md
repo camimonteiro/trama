@@ -2,6 +2,7 @@
 name: Bug
 about: Algo não funciona como deveria
 labels: bug
+title: "bug: "
 ---
 ## O que aconteceu
 

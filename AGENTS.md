@@ -8,7 +8,8 @@ Trama (nome temporário): ferramenta de AI para designers que conecta craft e cr
 
 ## Regras de idioma (ADR-0005)
 - **Português:** conteúdo de documentação (`management/`, `README`, decks, hub) e **descrições** de PR e issues.
-- **Inglês:** código, nomes de pastas e arquivos, branches, mensagens de commit, títulos de PR, identificadores, comentários de código, configuração.
+- **Títulos de issues e PRs (ADR-0009):** `<tipo>: <Título em português>`. Tipo em inglês: a label na issue (`task`, `research`, `decision`, `bug`), o tipo do Conventional Commits no PR. Ex.: `research: Benchmark de ferramentas de AI para designers`, `feat: Adicionar upload de tela`.
+- **Inglês:** código, nomes de pastas e arquivos, branches, mensagens de commit, identificadores, comentários de código, configuração.
 
 ## Mapa do repositório
 - `management/` — visão, roadmap, `open-questions.md`, `decisions/` (ADR/DDR), research, analysis, rituals, glossary.
@@ -18,10 +19,10 @@ Trama (nome temporário): ferramenta de AI para designers que conecta craft e cr
 - `site/` — GitHub Pages: `index.html` (hub), `artifacts.json`, `decks/<name>/`.
 
 ## Esteira (ADR-0004)
-1. Toda tarefa nasce como issue no GitHub Projects.
+1. Toda tarefa nasce como issue no GitHub Projects, com título `<label>: <Título em português>` e a label correspondente.
 2. Branch a partir da `main`: `type/short-description` (`feat`, `fix`, `docs`, `design`, `chore`, `research`).
 3. Commits em Conventional Commits, em inglês: `feat: add screen upload`.
-4. PR: título em inglês, descrição em português usando o template. Precisa de 1 aprovação humana (admins podem fazer o merge sem aprovação, ver ADR-0008; essa decisão é sempre humana).
+4. PR: título `<type>: <Título em português>` (vira o commit da `main` no squash), descrição em português usando o template. Precisa de 1 aprovação humana (admins podem fazer o merge sem aprovação, ver ADR-0008; essa decisão é sempre humana).
 5. Antes do review humano, o agente revisa o diff com o checklist do template de PR.
 6. Squash merge. O deploy para o Pages é automático.
 7. **Nunca** faça push direto na `main`, force-push em branch compartilhada nem merge sem aprovação. Agentes **nunca** usam o bypass de admin por conta própria.
