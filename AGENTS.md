@@ -5,6 +5,7 @@ Itens exclusivos de uma ferramenta são marcados, por exemplo **[Claude-only]**.
 
 ## Projeto
 Trama (nome temporário): ferramenta de AI para designers que conecta craft e criação de interfaces a dados, métricas e embasamento de UX/design. Projeto final do curso Salto (Aprender Design). Time: Camille Monteiro e Lucas Sampaio (product designers); mentor: Danilo Campos.
+O trabalho é **assíncrono**. O único momento síncrono da dupla é a weekly (segundas, 21h–22h, até 2027-04-24). Assuntos que precisem de conversa vão para a pauta dela ([rituais](management/rituals/README.md)). Cronograma: [ADR-0010](management/decisions/ADR-0010-project-schedule.md).
 
 ## Regras de idioma (ADR-0005)
 - **Português:** conteúdo de documentação (`management/`, `README`, decks, hub) e **descrições** de PR e issues.

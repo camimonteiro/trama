@@ -24,6 +24,8 @@ Dividir as cerca de 25 semanas, de 02/11/2026 a 24/04/2027, em 5 marcos, que vir
 | 3 · MVP | 15/02 → 26/03/2027 | Primeira versão funcional em `/app/` | — |
 | 4 · Entrega final | 29/03 → 24/04/2027 | Refinamento, narrativa, material de apresentação | 3ª, ~09/04 |
 
+O time trabalha de forma assíncrona. A weekly (segundas, 21h–22h, de 02/11/2026 até o fim do projeto) é o único momento síncrono e o ponto de controle semanal do cronograma ([rituais](../rituals/README.md)).
+
 ## Alternativas consideradas
 | Opção | Prós | Contras |
 |---|---|---|

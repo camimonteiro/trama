@@ -1,6 +1,6 @@
 # Roadmap
 
-> Cronograma definido no [ADR-0010](decisions/ADR-0010-project-schedule.md). Só a entrega final (2027-04-24) é data do curso; as demais são planejamento do time. Datas por card ficam no [GitHub Projects](https://github.com/users/camimonteiro/projects/1) e os marcos são [milestones](https://github.com/camimonteiro/trama/milestones).
+> Cronograma definido no [ADR-0010](decisions/ADR-0010-project-schedule.md). Só a entrega final (2027-04-24) é data do curso; as demais são planejamento do time. Datas por card ficam no [GitHub Projects](https://github.com/users/camimonteiro/projects/1) e os marcos são [milestones](https://github.com/camimonteiro/trama/milestones). O andamento é revisado na weekly (segundas, 21h–22h), o único momento síncrono do time ([rituais](rituals/README.md)).
 
 | Marco | O que entrega | Período | Mentoria |
 |---|---|---|---|
