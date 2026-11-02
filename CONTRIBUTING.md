@@ -17,3 +17,5 @@ Resumo da esteira. A versão completa e animada está no [deck de onboarding](si
 7. **Decisões** — se o PR decide algo, inclua o ADR/DDR e atualize `management/open-questions.md`.
 
 A `main` é protegida: não aceita push direto e exige 1 aprovação.
+
+**Exceção:** quem tem papel de **admin** no repositório (hoje, a Camille) pode fazer o merge de um PR sem aprovação, para não travar o time pequeno. A exceção vale só para merge de PR: push direto continua bloqueado para todo mundo. Use com bom senso; o review continua sendo o padrão. Ver [ADR-0008](management/decisions/ADR-0008-admin-merge-bypass.md).

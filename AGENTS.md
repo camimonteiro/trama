@@ -21,10 +21,10 @@ Trama (nome temporário): ferramenta de AI para designers que conecta craft e cr
 1. Toda tarefa nasce como issue no GitHub Projects.
 2. Branch a partir da `main`: `type/short-description` (`feat`, `fix`, `docs`, `design`, `chore`, `research`).
 3. Commits em Conventional Commits, em inglês: `feat: add screen upload`.
-4. PR: título em inglês, descrição em português usando o template. Precisa de 1 aprovação humana.
+4. PR: título em inglês, descrição em português usando o template. Precisa de 1 aprovação humana (admins podem fazer o merge sem aprovação, ver ADR-0008; essa decisão é sempre humana).
 5. Antes do review humano, o agente revisa o diff com o checklist do template de PR.
 6. Squash merge. O deploy para o Pages é automático.
-7. **Nunca** faça push direto na `main`, force-push em branch compartilhada nem merge sem aprovação.
+7. **Nunca** faça push direto na `main`, force-push em branch compartilhada nem merge sem aprovação. Agentes **nunca** usam o bypass de admin por conta própria.
 
 ## Decisões e questões abertas
 - Questão sem resposta → adicionar linha em `management/open-questions.md` (`OQ-xxx`, status `open`).
