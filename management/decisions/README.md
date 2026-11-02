@@ -15,9 +15,11 @@ Use o [`_template.md`](_template.md). Toda decisão costuma nascer de uma [quest
 | [ADR-0002](ADR-0002-hosting-github-pages.md) | Hospedagem no GitHub Pages via Actions | aceita |
 | [ADR-0003](ADR-0003-ai-agnostic-strategy.md) | Estratégia agnóstica de AI | aceita |
 | [ADR-0004](ADR-0004-git-workflow.md) | Fluxo git: branches, commits, PRs e proteção da main | aceita |
-| [ADR-0005](ADR-0005-language-policy.md) | Política de idioma | aceita |
+| [ADR-0005](ADR-0005-language-policy.md) | Política de idioma | aceita (títulos de PR: ver ADR-0009) |
 | [ADR-0006](ADR-0006-project-management-github-projects.md) | Gestão no GitHub Projects | aceita |
 | [ADR-0007](ADR-0007-public-repo-no-license.md) | Repositório público, sem licença por ora | aceita |
+| [ADR-0008](ADR-0008-admin-merge-bypass.md) | Admin pode fazer merge de PR sem aprovação | aceita |
+| [ADR-0009](ADR-0009-issue-and-pr-title-pattern.md) | Padrão de título de issues e PRs | aceita |
 | [ADR-0008](ADR-0008-admin-merge-bypass.md) | Admin pode fazer merge de PR sem aprovação | aceita |
 | [DDR-0001](DDR-0001-temporary-name.md) | Nome temporário: Trama | aceita |
 | [DDR-0002](DDR-0002-provisional-visual-identity.md) | Identidade visual provisória (terracota) | aceita |

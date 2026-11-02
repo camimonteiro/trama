@@ -2,6 +2,7 @@
 name: Pesquisa
 about: Rodada de pesquisa ou análise
 labels: research
+title: "research: "
 ---
 ## Pergunta de pesquisa
 
