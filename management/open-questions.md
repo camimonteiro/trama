@@ -15,3 +15,4 @@ Status: `open` · `decided` · `dropped`
 | OQ-007 | Quais agentes o time usa (o Lucas usa Claude Code? em qual plano?) e se esses agentes leem `.claude/skills/` e `AGENTS.md` sem ajuste | Afeta o deck e a configuração de skills. | Camille + Lucas | open | — |
 | OQ-008 | Identidade visual definitiva | A atual é provisória ([DDR-0002](decisions/DDR-0002-provisional-visual-identity.md)). | Time | open | — |
 | OQ-009 | Usuário do GitHub da Camille e URL final do Pages | Confirmado no `gh auth login`: `camimonteiro` → https://camimonteiro.github.io/trama/ | Camille | decided | [ADR-0007](decisions/ADR-0007-public-repo-no-license.md) |
+| OQ-010 | Formato da ferramenta: web responsiva/PWA, app mobile nativo, plugin do Figma, extensão de navegador ou combinação | Ainda não definido. Enquanto isso, `app/` é só protótipo web ([ADR-0001](decisions/ADR-0001-product-stack.md)). Discussão: [issue #1](https://github.com/camimonteiro/trama/issues/1). | Time | open | — |

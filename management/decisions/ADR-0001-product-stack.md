@@ -11,6 +11,8 @@ O produto precisa de uma base de software desde o início, mas com custo baixo d
 ## Decisão
 Usar **Vite + React + TypeScript** em `app/`, gerando um build estático publicado em `/app/` no Pages.
 
+**Escopo:** esta decisão cobre só a base de **protótipo web**. O formato final da ferramenta (web, mobile nativo, plugin do Figma, extensão…) ainda está em aberto: [OQ-010](../open-questions.md).
+
 ## Alternativas consideradas
 | Opção | Prós | Contras |
 |---|---|---|
@@ -26,3 +28,4 @@ Usar **Vite + React + TypeScript** em `app/`, gerando um build estático publica
 ## Consequências
 - A chave de API de modelos **não pode** ficar no front-end. O backend/serverless é uma questão aberta: [OQ-005](../open-questions.md).
 - Pode ser revisto se o produto precisar de SSR ou rotas de API próprias.
+- Se a OQ-010 levar a mais de um formato, a reorganização sugerida é `apps/web`, `apps/mobile` e `packages/` (código compartilhado, incluindo a camada de AI). Um novo ADR registra essa mudança.
