@@ -48,9 +48,15 @@
     .btn:hover { transform: translateY(-2px); }
     .btn.primary { background: var(--color-accent-strong); color: var(--color-on-accent); }
     .btn.ghost { border: 1px solid var(--color-border); color: var(--color-text); background: var(--color-surface); }
-    .weave { position: absolute; right: -60px; top: 40px; width: 420px; opacity: .9; pointer-events: none; display: none; }
-    @media (min-width: 960px) { .weave { display: block; } }
-    .weave path { fill: none; stroke-width: 3; stroke-linecap: round; }
+    /* Weave fills the space right of the text: starts one gap after the lead's 60ch column and bleeds to the edge */
+    .weave {
+      --weave-left: calc(max(0px, 50% - 540px) + var(--space-8) + 60ch + var(--space-12));
+      position: absolute; top: var(--space-8); left: var(--weave-left);
+      width: calc(100% - var(--weave-left)); height: calc(100% - 2 * var(--space-8)); font-size: var(--text-lg);
+      opacity: .9; pointer-events: none; display: none; overflow: visible;
+    }
+    @media (min-width: 1100px) { .weave { display: block; } }
+    .weave path { fill: none; stroke-width: 4; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 
     /* Sections */
     section { padding: var(--space-12) 0; border-top: 1px solid var(--color-border); }
@@ -119,12 +125,12 @@
   <main>
     <div class="hero">
       <div class="wrap">
-        <svg class="weave" viewBox="0 0 420 300" aria-hidden="true">
-          <path d="M0 60 C120 60 160 240 420 240" stroke="var(--terracotta-500)"/>
-          <path d="M0 240 C140 240 200 60 420 60" stroke="var(--color-text)" opacity=".7"/>
-          <path d="M0 150 C120 120 300 180 420 150" stroke="var(--terracotta-300)"/>
-          <path d="M0 100 C160 110 260 200 420 200" stroke="var(--sage-500)"/>
-          <path d="M0 200 C160 190 260 100 420 100" stroke="var(--indigo-500)" opacity=".7"/>
+        <svg class="weave" viewBox="0 0 420 300" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 30 C120 30 160 270 420 270" stroke="var(--terracotta-500)" pathLength="1"/>
+          <path d="M0 270 C140 270 200 30 420 30" stroke="var(--color-text)" opacity=".7" pathLength="1"/>
+          <path d="M0 150 C120 110 300 190 420 150" stroke="var(--terracotta-300)" pathLength="1"/>
+          <path d="M0 83 C160 96 260 217 420 217" stroke="var(--sage-500)" pathLength="1"/>
+          <path d="M0 217 C160 204 260 83 420 83" stroke="var(--indigo-500)" opacity=".7" pathLength="1"/>
         </svg>
         <span class="eyebrow">Projeto final · Salto · Aprender Design</span>
         <h1>Craft com <em>embasamento</em>.</h1>
@@ -259,8 +265,8 @@
       // Weave: threads draw in, then drift gently
       gsap.set('.weave', { visibility: 'visible' });
       document.querySelectorAll('.weave path').forEach((p, i) => {
-        const len = p.getTotalLength();
-        gsap.fromTo(p, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut', delay: 0.3 + i * 0.15 });
+        // pathLength="1" keeps the dash math right while the SVG stretches to the hero
+        gsap.fromTo(p, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut', delay: 0.3 + i * 0.15 });
         gsap.to(p, { y: i % 2 ? 6 : -6, duration: 3 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2 });
       });
 
