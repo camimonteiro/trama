@@ -1,0 +1,118 @@
+/*
+ * Trama — design tokens (provisional, see management/decisions/DDR-0002).
+ * Single source for the hub, decks and app. Change here, everything follows.
+ * Contrast values (WCAG 2.x) measured against --color-bg of each theme.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  /* Terracotta scale */
+  --terracotta-50: #FBF1EC;
+  --terracotta-100: #F6DFD4;
+  --terracotta-200: #EDBDA8;
+  --terracotta-300: #E0977A;
+  --terracotta-400: #D27654; /* 5.72:1 on dark bg */
+  --terracotta-500: #C2603F; /* brand base — graphics and large text only (3.90:1 on light bg) */
+  --terracotta-600: #A84E31; /* 5.18:1 on light bg; white text on it 5.53:1 */
+  --terracotta-700: #8A3F28;
+  --terracotta-800: #6B3220;
+  --terracotta-900: #4A2416;
+
+  /* Warm neutrals */
+  --sand-0: #FFFFFF;
+  --sand-50: #FAF7F4;
+  --sand-100: #F2ECE6;
+  --sand-200: #E4DBD3;
+  --sand-400: #A89990;
+  --sand-600: #6B5D55; /* 5.92:1 on light bg */
+  --sand-900: #1F1814; /* 16.41:1 on light bg */
+
+  /* Support colors for diagrams (branches) */
+  --sage-500: #6F8F72;
+  --indigo-500: #5B67A8;
+  --ochre-500: #C9962E;
+
+  /* Semantic — light */
+  --color-bg: var(--sand-50);
+  --color-surface: var(--sand-0);
+  --color-surface-2: var(--sand-100);
+  --color-border: var(--sand-200);
+  --color-text: var(--sand-900);
+  --color-text-muted: var(--sand-600);
+  --color-accent: var(--terracotta-500);
+  --color-accent-text: var(--terracotta-600);
+  --color-accent-soft: var(--terracotta-50);
+  --color-on-accent: #FFFFFF;
+  --color-accent-strong: var(--terracotta-600);
+
+  /* Type */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: clamp(2rem, 4vw, 2.75rem);
+  --text-3xl: clamp(2.5rem, 7vw, 4.5rem);
+
+  /* Space (4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Shape and depth */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgb(31 24 20 / 0.06);
+  --shadow-md: 0 8px 24px -8px rgb(31 24 20 / 0.14);
+
+  /* Motion */
+  --duration-fast: 160ms;
+  --duration-base: 320ms;
+  --duration-slow: 640ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #17120F;
+    --color-surface: #211A16;
+    --color-surface-2: #2B231E;
+    --color-border: #3A2F28;
+    --color-text: #F3ECE6;       /* 15.89:1 */
+    --color-text-muted: #B3A49A; /* 7.69:1 */
+    --color-accent: var(--terracotta-400);
+    --color-accent-text: var(--terracotta-300);
+    --color-accent-soft: #33221B;
+    --color-on-accent: #17120F;
+    --color-accent-strong: var(--terracotta-400);
+    --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.5);
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #17120F;
+  --color-surface: #211A16;
+  --color-surface-2: #2B231E;
+  --color-border: #3A2F28;
+  --color-text: #F3ECE6;
+  --color-text-muted: #B3A49A;
+  --color-accent: var(--terracotta-400);
+  --color-accent-text: var(--terracotta-300);
+  --color-accent-soft: #33221B;
+  --color-on-accent: #17120F;
+  --color-accent-strong: var(--terracotta-400);
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.5);
+}

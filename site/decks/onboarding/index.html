@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Onboarding Trama — git, GitHub e AI</title>
+  <meta name="description" content="Deck para nivelar o time da Trama em git, branches, PRs, GitHub, agentes de AI e na esteira do projeto.">
+  <link rel="stylesheet" href="../../assets/tokens.css">
+  <link rel="stylesheet" href="deck.css">
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <header class="topbar">
+    <a class="home" href="../../">← Trama</a>
+    <span class="spacer"></span>
+    <button class="iconbtn" id="themeBtn" aria-label="Alternar tema claro/escuro">◐</button>
+    <button class="iconbtn" id="indexBtn" aria-expanded="false" aria-controls="index">Índice</button>
+  </header>
+
+  <main class="deck" id="deck">
+
+    <!-- 01 -->
+    <section class="slide" data-git="0" data-title="Abertura">
+      <div class="inner">
+        <p class="kicker a">Onboarding · Trama</p>
+        <h1>Como a gente <em>constrói</em> a Trama.</h1>
+        <p class="lead a">Git, branches, pull requests, GitHub, agentes de AI e a nossa esteira, do zero, para todo mundo falar a mesma língua.</p>
+        <p class="small a">Use ← → (ou espaço), role a página, deslize no celular ou use os botões abaixo. Tecla <kbd>I</kbd> abre o índice.</p>
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section class="slide" data-git="0" data-title="Por que versionar">
+      <div class="inner">
+        <p class="kicker a">Por que versionar</p>
+        <h2>Você já viveu isso.</h2>
+        <div class="files a" style="margin-bottom:var(--space-6)">
+          <span class="file">tela_home.fig</span><span class="file">tela_home_v2.fig</span><span class="file">tela_home_v2_FINAL.fig</span><span class="file">tela_home_final_agora_vai.fig</span><span class="file">tela_home_final_LUCAS_revisado.fig</span>
+        </div>
+        <p class="lead a">O histórico de versões do Figma resolve parte disso. O <strong>git</strong> faz o mesmo para qualquer arquivo do projeto (código, docs, decks) e ainda permite que duas pessoas trabalhem em paralelo sem sobrescrever uma à outra.</p>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section class="slide" data-git="1" data-title="Repositório">
+      <div class="inner cols c2" style="align-items:center">
+        <div>
+          <p class="kicker a">Conceito 1</p>
+          <h2>Repositório</h2>
+          <p class="lead a">A pasta do projeto + todo o histórico de mudanças dela. Existe uma cópia no seu computador (<em>local</em>) e uma no GitHub (<em>remoto</em>).</p>
+        </div>
+        <pre class="term a"><span class="c"># baixar o repositório pela primeira vez</span>
+<span class="p">$ </span>git clone https://github.com/&lt;owner&gt;/trama.git
+<span class="p">$ </span>cd trama</pre>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section class="slide" data-git="2" data-title="Commit">
+      <div class="inner cols c2" style="align-items:center">
+        <div>
+          <p class="kicker a">Conceito 2</p>
+          <h2>Commit</h2>
+          <p class="lead a">Um "salvamento" com descrição. Cada commit vira um ponto no histórico, e dá para voltar a qualquer um deles.</p>
+          <p class="small a">Na Trama, mensagens em <strong>inglês</strong>, no padrão Conventional Commits.</p>
+        </div>
+        <pre class="term a"><span class="p">$ </span>git add management/vision/brief.md
+<span class="p">$ </span><span class="type">git commit -m "docs: add first project brief"</span></pre>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section class="slide" data-git="3" data-title="Histórico e main">
+      <div class="inner">
+        <p class="kicker a">Conceito 3</p>
+        <h2>A <em>main</em> é a linha oficial.</h2>
+        <p class="lead a">A sequência de commits forma o histórico. A branch <code>main</code> é a versão oficial do projeto: o que está nela vai para o ar. Olhe a linha aqui embaixo, ela vai contar a história deste deck.</p>
+        <pre class="term a"><span class="p">$ </span>git log --oneline
+<span class="c">c3 docs: add research plan
+c2 docs: add first project brief
+c1 chore: initial structure</span></pre>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section class="slide" data-git="4" data-title="Branches">
+      <div class="inner">
+        <p class="kicker a">Conceito 4</p>
+        <h2>Branch: uma linha paralela.</h2>
+        <p class="lead a">Uma branch é uma cópia da linha principal onde você trabalha à vontade. A <code>main</code> não muda até você pedir para juntar (merge). É como duplicar uma página do Figma para explorar, só que dá para juntar de volta de forma controlada.</p>
+        <div class="cols c3">
+          <div class="box a"><h3>Segurança</h3><p>A main continua estável enquanto você experimenta.</p></div>
+          <div class="box a"><h3>Paralelismo</h3><p>Camille e Lucas trabalham ao mesmo tempo sem conflito.</p></div>
+          <div class="box a"><h3>Revisão</h3><p>Toda mudança passa por um PR antes de entrar.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section class="slide" data-git="5" data-title="Criar e trocar de branch">
+      <div class="inner cols c2" style="align-items:center">
+        <div>
+          <p class="kicker a">Na prática</p>
+          <h2>Criar e trocar de branch</h2>
+          <p class="lead a">Sempre parta da <code>main</code> atualizada. Depois, trabalhe e faça commits normalmente.</p>
+        </div>
+        <pre class="term a"><span class="p">$ </span>git switch main
+<span class="p">$ </span>git pull
+<span class="p">$ </span>git switch -c feat/screen-upload
+<span class="c"># ...trabalho...</span>
+<span class="p">$ </span>git commit -m "feat: add upload area"</pre>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section class="slide" data-git="6" data-title="Nomes de branch">
+      <div class="inner">
+        <p class="kicker a">Convenção da Trama</p>
+        <h2><code style="font-size:.8em">type/short-description</code></h2>
+        <p class="lead a">Em inglês, minúsculas e com hífens. O tipo diz que tipo de trabalho é:</p>
+        <div class="cols c3">
+          <div class="box a"><span class="num">feat/</span><h3>Funcionalidade</h3><p>feat/screen-upload</p></div>
+          <div class="box a"><span class="num">fix/</span><h3>Correção</h3><p>fix/broken-hub-link</p></div>
+          <div class="box a"><span class="num">docs/</span><h3>Documentação</h3><p>docs/adr-backend</p></div>
+          <div class="box a"><span class="num">design/</span><h3>Design</h3><p>design/color-tokens</p></div>
+          <div class="box a"><span class="num">research/</span><h3>Pesquisa</h3><p>research/interviews-round-1</p></div>
+          <div class="box a"><span class="num">chore/</span><h3>Manutenção</h3><p>chore/update-deps</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 -->
+    <section class="slide" data-git="7" data-title="Pull Request">
+      <div class="inner cols c2" style="align-items:center">
+        <div>
+          <p class="kicker a">Conceito 5</p>
+          <h2>Pull Request</h2>
+          <p class="lead a">O pedido para juntar sua branch na <code>main</code>. É onde a mudança é explicada, discutida e aprovada.</p>
+          <ul class="clean a small">
+            <li>Título em <strong>inglês</strong> (como um commit)</li>
+            <li>Descrição em <strong>português</strong>, usando o template</li>
+            <li>Linka a issue: <code>Closes #12</code></li>
+          </ul>
+        </div>
+        <div class="pr" data-flip-id="pr">
+          <div class="pr-title">feat: add screen upload</div>
+          <div class="pr-meta">feat/screen-upload → main · 2 commits</div>
+          <p class="small" style="margin:var(--space-3) 0 0"><strong>Contexto:</strong> designers precisam enviar uma tela para análise. Closes #12</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" data-git="8" data-title="Review">
+      <div class="inner cols c2" style="align-items:center">
+        <div class="pr" data-flip-id="pr">
+          <div class="pr-title">feat: add screen upload</div>
+          <div class="pr-meta">feat/screen-upload → main · 2 commits</div>
+          <div style="display:grid;gap:var(--space-3);margin-top:var(--space-4)">
+            <div class="comment a"><span class="who ai">AI</span><p class="small" style="margin:0">Revisei o diff com o checklist: falta tratar arquivo maior que 10 MB.</p></div>
+            <div class="comment a"><span class="who">CM</span><p class="small" style="margin:0">Corrigido no último commit.</p></div>
+            <div class="comment a"><span class="who">LS</span><p class="small" style="margin:0"><strong>✓ Aprovado.</strong> Ficou ótimo!</p></div>
+          </div>
+        </div>
+        <div>
+          <p class="kicker a">Conceito 6</p>
+          <h2>Review</h2>
+          <p class="lead a">Primeiro um agente de AI revisa o diff. Depois a outra pessoa designer lê, comenta e aprova. Sem aprovação, a <code>main</code> não aceita o merge.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide" data-git="9" data-title="Merge">
+      <div class="inner">
+        <p class="kicker a">Conceito 7</p>
+        <h2>Squash &amp; merge</h2>
+        <p class="lead a">Os commits do PR viram <strong>um</strong> commit na <code>main</code>. O histórico fica limpo, a branch pode ser apagada e o GitHub publica a nova versão sozinho.</p>
+        <div class="pr mini" data-flip-id="pr">
+          <div class="pr-title">feat: add screen upload (#13)</div>
+          <div class="pr-meta">merged into main</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide" data-git="10" data-title="Conflitos">
+      <div class="inner cols c2" style="align-items:center">
+        <div>
+          <p class="kicker a">Quando dá ruim</p>
+          <h2>Conflitos</h2>
+          <p class="lead a">Acontece quando duas branches mudam <strong>a mesma linha</strong> do mesmo arquivo. O git não adivinha qual vale e pede para você escolher.</p>
+          <p class="small a">Dica: peça ajuda ao agente de AI ("resolva o conflito mantendo as duas mudanças"), mas confira o resultado antes do commit.</p>
+        </div>
+        <pre class="term a">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+--color-accent: #C2603F;
+=======
+--color-accent: #B85A3A;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; design/color-tokens</pre>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide" data-git="11" data-title="Issues e Projects" data-fx="kanban">
+      <div class="inner">
+        <p class="kicker a">GitHub</p>
+        <h2>Issues + Projects</h2>
+        <p class="lead a">Toda tarefa nasce como <strong>issue</strong> e anda num quadro do <strong>GitHub Projects</strong>. O PR fecha a issue automaticamente.</p>
+        <div class="kanban a">
+          <div class="kcol" data-col="0"><b>Backlog</b><div class="kcard">Pesquisa com designers</div><div class="kcard hot" data-flip-id="issue">#12 Upload de tela</div></div>
+          <div class="kcol" data-col="1"><b>In progress</b><div class="kcard hide-sm">Tokens de cor</div></div>
+          <div class="kcol" data-col="2"><b>In review</b></div>
+          <div class="kcol" data-col="3"><b>Done</b><div class="kcard hide-sm">Estrutura do repo</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 -->
+    <section class="slide" data-git="11" data-title="Actions e Pages" data-fx="flow">
+      <div class="inner">
+        <p class="kicker a">GitHub</p>
+        <h2>Actions + Pages</h2>
+        <p class="lead a">A cada merge na <code>main</code>, o <strong>GitHub Actions</strong> monta o site e publica no <strong>GitHub Pages</strong>. Ninguém faz deploy na mão.</p>
+        <div class="flow a" style="--n:4">
+          <div class="flowline"></div>
+          <div class="step"><strong>merge</strong><span>na main</span></div>
+          <div class="step"><strong>build</strong><span>app + site</span></div>
+          <div class="step"><strong>upload</strong><span>artefato do Pages</span></div>
+          <div class="step"><strong>no ar</strong><span>hub, decks, /app</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 -->
+    <section class="slide no-rail" data-git="0" data-title="Agentes de AI">
+      <div class="inner">
+        <p class="kicker a">AI no fluxo</p>
+        <h2>Agentes de AI, <em>qualquer um</em>.</h2>
+        <p class="lead a">Um agente (Claude Code, Codex, Cursor, Gemini CLI…) lê e altera o repositório a partir de pedidos em linguagem natural. A Trama é <strong>agnóstica</strong>: as regras ficam num arquivo que qualquer agente entende.</p>
+        <div class="cols c2">
+          <div class="box a"><span class="num">AGENTS.md</span><h3>Fonte única de instruções</h3><p>Convenções, idioma, esteira e mapa do repo. Formato aberto: agents.md.</p></div>
+          <div class="box a"><span class="num">CLAUDE.md <span class="tag claude">Claude-only</span></span><h3>Ponte para o Claude Code</h3><p>Só importa o AGENTS.md (<code>@AGENTS.md</code>) e adiciona o que é específico do Claude.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 -->
+    <section class="slide no-rail" data-git="0" data-title="Skills">
+      <div class="inner">
+        <p class="kicker a">AI no fluxo</p>
+        <h2>Skills: procedimentos reutilizáveis</h2>
+        <p class="lead a">Uma skill é um passo a passo num <code>SKILL.md</code> (formato aberto Agent Skills). Em vez de explicar tudo de novo, você pede: "registre essa decisão".</p>
+        <div class="cols c4">
+          <div class="box a"><span class="num">record-decision</span><h3>Registrar decisão</h3><p>Cria ADR/DDR e fecha a questão aberta.</p></div>
+          <div class="box a"><span class="num">open-pr</span><h3>Abrir PR</h3><p>Branch, commits e PR na convenção.</p></div>
+          <div class="box a"><span class="num">publish-artifact</span><h3>Publicar artefato</h3><p>Coloca um deck ou doc no hub.</p></div>
+          <div class="box a"><span class="num">synthesize-research</span><h3>Sintetizar pesquisa</h3><p>Notas → temas → insights.</p></div>
+        </div>
+        <p class="small a" style="margin-top:var(--space-4)">Ficam em <code>.claude/skills/</code>. Se outro agente não ler essa pasta, dá para pedir que ele leia o arquivo como instrução.</p>
+      </div>
+    </section>
+
+    <!-- 17 -->
+    <section class="slide no-rail" data-git="0" data-title="Como pedir">
+      <div class="inner">
+        <p class="kicker a">AI no fluxo</p>
+        <h2>Como pedir a um agente</h2>
+        <div class="cols c2">
+          <div class="box a"><h3>"Crie uma branch para a issue #12 e implemente o upload de tela."</h3><p>O agente segue a convenção de nomes do AGENTS.md.</p></div>
+          <div class="box a"><h3>"Revise meu diff com o checklist do template de PR."</h3><p>Review prévia antes de chamar a outra pessoa.</p></div>
+          <div class="box a"><h3>"Abra o PR com a descrição em português."</h3><p>Usa a skill <code>open-pr</code>.</p></div>
+          <div class="box a"><h3>"Fechamos a OQ-005. Registre a decisão."</h3><p>Usa a skill <code>record-decision</code>.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 -->
+    <section class="slide no-rail" data-git="0" data-title="Claude Code">
+      <div class="inner">
+        <p class="kicker a"><span class="tag claude">Claude-only</span> &nbsp;Só para quem usa Claude Code</p>
+        <h2>Extras do Claude Code</h2>
+        <div class="cols c3">
+          <div class="box a"><span class="num">CLAUDE.md</span><h3>Memória do projeto</h3><p>Carregado automaticamente; aqui ele importa o AGENTS.md.</p></div>
+          <div class="box a"><span class="num">.claude/</span><h3>Config e skills</h3><p><code>settings.json</code> com permissões do time; skills carregadas sob demanda.</p></div>
+          <div class="box a"><span class="num">/code-review</span><h3>Review do diff</h3><p>Comando de review antes de pedir aprovação humana.</p></div>
+        </div>
+        <p class="small a" style="margin-top:var(--space-4)">Documentação: <a href="https://code.claude.com/docs" target="_blank" rel="noopener">code.claude.com/docs</a>. Em outro agente, use o equivalente genérico descrito no AGENTS.md.</p>
+      </div>
+    </section>
+
+    <!-- 19 -->
+    <section class="slide no-rail" data-git="0" data-title="Limites">
+      <div class="inner cols c2" style="align-items:center">
+        <div>
+          <p class="kicker a">Boas práticas</p>
+          <h2>A AI propõe. <em>A gente decide.</em></h2>
+        </div>
+        <ul class="clean a">
+          <li>Leia o diff antes de commitar. Sempre.</li>
+          <li>Peça fontes e marque o que é sugestão e o que é fato.</li>
+          <li>Nunca cole chaves, senhas ou dados pessoais num prompt ou no código.</li>
+          <li>Mudanças pequenas e PRs pequenos são mais fáceis de revisar.</li>
+          <li>Não sabe? Abra uma questão aberta em vez de inventar.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 20 -->
+    <section class="slide" data-git="11" data-title="A esteira da Trama" data-fx="flow">
+      <div class="inner">
+        <p class="kicker a">Tudo junto</p>
+        <h2>A esteira da Trama</h2>
+        <div class="flow a" style="--n:6">
+          <div class="flowline"></div>
+          <div class="step"><strong>Issue</strong><span>GitHub Projects</span></div>
+          <div class="step"><strong>Branch</strong><span>type/short-description</span></div>
+          <div class="step"><strong>Commits</strong><span>EN · Conventional</span></div>
+          <div class="step"><strong>PR</strong><span>descrição em PT</span></div>
+          <div class="step"><strong>Review</strong><span>AI + 1 aprovação</span></div>
+          <div class="step"><strong>Deploy</strong><span>squash → Pages</span></div>
+        </div>
+        <p class="small a" style="margin-top:var(--space-4)">A <code>main</code> é protegida: sem push direto, sem merge sem aprovação.</p>
+      </div>
+    </section>
+
+    <!-- 21 -->
+    <section class="slide no-rail" data-git="0" data-title="Idioma">
+      <div class="inner">
+        <p class="kicker a">Combinado</p>
+        <h2>Português ou inglês?</h2>
+        <div class="lang">
+          <div class="box a"><span class="num">PT</span><h3>Português</h3><p>Documentação, hub, decks, descrições de PR e issues, decisões (ADR/DDR), atas.</p></div>
+          <div class="box en a"><span class="num">EN</span><h3>Inglês</h3><p>Código, pastas e arquivos, branches, commits, títulos de PR, configuração.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 -->
+    <section class="slide no-rail" data-git="0" data-title="Questões e decisões" data-fx="flow">
+      <div class="inner">
+        <p class="kicker a">Gestão</p>
+        <h2>Questão aberta → <em>decisão</em></h2>
+        <p class="lead a">O que não sabemos fica em <code>management/open-questions.md</code>. Quando é respondido, vira um registro de decisão: <strong>ADR</strong> (técnica) ou <strong>DDR</strong> (design).</p>
+        <div class="flow a" style="--n:4">
+          <div class="flowline"></div>
+          <div class="step"><strong>OQ-005</strong><span>status: open</span></div>
+          <div class="step"><strong>Discussão</strong><span>sync, mentoria, PR</span></div>
+          <div class="step"><strong>ADR-0008</strong><span>contexto, opções, embasamento</span></div>
+          <div class="step"><strong>OQ-005</strong><span>status: decided ↗</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 -->
+    <section class="slide no-rail" data-git="0" data-title="Cola rápida">
+      <div class="inner cols c2">
+        <div>
+          <p class="kicker a">Cola rápida</p>
+          <h2>Para ter à mão</h2>
+          <p class="lead a">Ou peça ao agente em português e confira o que ele fez.</p>
+        </div>
+        <pre class="term a"><span class="p">$ </span>git switch main &amp;&amp; git pull   <span class="c"># atualizar</span>
+<span class="p">$ </span>git switch -c feat/thing        <span class="c"># nova branch</span>
+<span class="p">$ </span>git status                      <span class="c"># o que mudou?</span>
+<span class="p">$ </span>git add . &amp;&amp; git commit -m "feat: ..."
+<span class="p">$ </span>git push -u origin HEAD         <span class="c"># enviar</span>
+<span class="p">$ </span>gh pr create                    <span class="c"># abrir PR</span>
+<span class="p">$ </span>gh pr checkout 13               <span class="c"># revisar PR</span></pre>
+      </div>
+    </section>
+
+    <!-- 24 -->
+    <section class="slide no-rail" data-git="0" data-title="Links">
+      <div class="inner">
+        <p class="kicker a">Para aprofundar</p>
+        <h2>Fontes e links</h2>
+        <div class="cols c2">
+          <ul class="clean a small">
+            <li><a href="https://git-scm.com/book/pt-br/v2" target="_blank" rel="noopener">Pro Git (livro gratuito, pt-BR)</a></li>
+            <li><a href="https://docs.github.com/pt/get-started/using-github/github-flow" target="_blank" rel="noopener">GitHub flow</a></li>
+            <li><a href="https://www.conventionalcommits.org/pt-br/v1.0.0/" target="_blank" rel="noopener">Conventional Commits</a></li>
+            <li><a href="https://docs.github.com/pt/pages" target="_blank" rel="noopener">GitHub Pages</a></li>
+          </ul>
+          <ul class="clean a small">
+            <li><a href="https://agents.md" target="_blank" rel="noopener">AGENTS.md</a></li>
+            <li><a href="https://agentskills.io" target="_blank" rel="noopener">Agent Skills</a></li>
+            <li><a href="https://code.claude.com/docs" target="_blank" rel="noopener">Claude Code docs</a> <span class="tag claude">Claude-only</span></li>
+            <li><a href="https://gsap.com" target="_blank" rel="noopener">GSAP</a>, as animações deste deck</li>
+          </ul>
+        </div>
+        <p class="big-quote a" style="margin-top:var(--space-8)">Dúvida? Abre uma issue. 🧵</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Git rail: elements appear when the slide's data-git >= data-step (and <= data-until) -->
+  <div class="rail" id="rail" aria-hidden="true">
+    <svg viewBox="0 0 1000 100">
+      <path class="main" data-step="1" d="M30 70 H130"/>
+      <path class="main" data-step="2" d="M130 70 H230"/>
+      <path class="main" data-step="3" d="M230 70 H330"/>
+      <path class="branch" data-step="4" d="M330 70 C380 70 380 25 430 25 H470"/>
+      <path class="branch" data-step="6" d="M470 25 H570"/>
+      <path class="main" data-step="9" d="M330 70 H720"/>
+      <path class="merge" data-step="9" d="M570 25 H620 C670 25 670 70 720 70"/>
+      <path class="main" data-step="11" d="M720 70 H970"/>
+      <text data-step="1" x="30" y="94">main</text>
+      <text data-step="4" x="400" y="12">feat/screen-upload</text>
+      <circle class="cm" data-step="1" cx="130" cy="70" r="8"/>
+      <circle class="cm" data-step="2" cx="230" cy="70" r="8"/>
+      <circle class="cm" data-step="3" cx="330" cy="70" r="8"/>
+      <circle class="cb" data-step="5" cx="470" cy="25" r="8"/>
+      <circle class="cb" data-step="6" cx="570" cy="25" r="8"/>
+      <g class="badge" data-step="7" data-until="7"><rect x="590" y="12" width="64" height="26" rx="13"/><text x="606" y="29">PR #13</text></g>
+      <g class="badge ok" data-step="8" data-until="8"><rect x="590" y="12" width="92" height="26" rx="13"/><text x="602" y="29">✓ aprovado</text></g>
+      <circle class="cmerge" data-step="9" cx="720" cy="70" r="11"/>
+      <circle class="conflict" data-step="10" data-until="10" cx="720" cy="70" r="20"/>
+      <circle class="cm" data-step="11" cx="830" cy="70" r="8"/>
+      <circle class="cm" data-step="11" cx="930" cy="70" r="8"/>
+    </svg>
+  </div>
+
+  <nav class="navbar" aria-label="Navegação do deck">
+    <span id="counter">01 / 24</span>
+    <span class="hint">← → · espaço · rolagem · I = índice</span>
+    <span class="btns">
+      <button class="iconbtn" id="prevBtn" aria-label="Slide anterior">←</button>
+      <button class="iconbtn" id="nextBtn" aria-label="Próximo slide">→</button>
+    </span>
+  </nav>
+
+  <div class="index" id="index" role="dialog" aria-label="Índice de slides"><ol id="indexList"></ol></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Observer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+  <script src="deck.js"></script>
+</body>
+</html>

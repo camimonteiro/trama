@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Onboarding: git, GitHub, AI e a nossa esteira",
+    "type": "deck",
+    "date": "2026-11-02",
+    "href": "decks/onboarding/",
+    "description": "Deck interativo para nivelar o time em branches, PRs, uso de agentes de AI e no processo do projeto."
+  },
+  {
+    "title": "Produto (em construção)",
+    "type": "prototype",
+    "date": "2026-11-02",
+    "href": "app/",
+    "description": "Base do produto em Vite + React + TypeScript, com camada de AI agnóstica (provedor mock)."
+  },
+  {
+    "title": "Decisões (ADR/DDR)",
+    "type": "decision",
+    "date": "2026-11-02",
+    "href": "https://github.com/OWNER/trama/tree/main/management/decisions",
+    "description": "Registro de todas as decisões técnicas e de design do projeto."
+  },
+  {
+    "title": "Questões abertas",
+    "type": "doc",
+    "date": "2026-11-02",
+    "href": "https://github.com/OWNER/trama/blob/main/management/open-questions.md",
+    "description": "O que ainda precisa ser decidido. Cada resposta vira um ADR ou DDR."
+  },
+  {
+    "title": "Identidade visual provisória",
+    "type": "doc",
+    "date": "2026-11-02",
+    "href": "https://github.com/OWNER/trama/blob/main/design/identity/references.md",
+    "description": "Referências, tokens e racional da identidade em terracota."
+  }
+]

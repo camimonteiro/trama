@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(npm run build)",
+      "Bash(npm run dev)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push origin main)"
+    ]
+  }
+}

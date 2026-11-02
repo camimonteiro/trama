@@ -1,0 +1,17 @@
+# Questões abertas
+
+Tudo o que ainda não foi decidido fica aqui. **Quando uma questão é respondida, ela vira uma decisão** ([ADR/DDR](decisions/README.md)): crie o registro a partir do [template](decisions/_template.md), mude o status para `decided` e linke a decisão.
+
+Status: `open` · `decided` · `dropped`
+
+| ID | Questão | Contexto | Responsável | Status | Decisão |
+|---|---|---|---|---|---|
+| OQ-001 | Contexto, prazos, marcos e requisitos de entrega do curso Salto | Não há informação pública verificada; a Camille vai trazer. Define o roadmap, a linha do tempo do hub e os rituais. | Camille | open | — |
+| OQ-002 | Usuário do GitHub do Danilo Campos | Necessário para convidá-lo como colaborador/revisor. | Camille | open | — |
+| OQ-003 | Nome definitivo do produto | "Trama" é temporário. Verificar marca (INPI), domínio (registro.br) e conflito com ferramentas existentes. Renomear o repo muda a URL do Pages. | Time | open | — |
+| OQ-004 | Licença definitiva do repositório | Hoje sem licença (todos os direitos reservados). | Time | open | — |
+| OQ-005 | Backend/serverless para chamar modelos de AI sem expor chaves | O Pages é estático. Opções a avaliar: Cloudflare Workers, Vercel Functions, Supabase Edge Functions. | Time + Danilo | open | — |
+| OQ-006 | Provedor(es) de modelo de AI usados no produto | A interface `AIProvider` permite trocar; falta escolher o primeiro e o modelo de custos. | Time | open | — |
+| OQ-007 | Quais agentes o time usa (o Lucas usa Claude Code? em qual plano?) e se esses agentes leem `.claude/skills/` e `AGENTS.md` sem ajuste | Afeta o deck e a configuração de skills. | Camille + Lucas | open | — |
+| OQ-008 | Identidade visual definitiva | A atual é provisória ([DDR-0002](decisions/DDR-0002-provisional-visual-identity.md)). | Time | open | — |
+| OQ-009 | Usuário do GitHub da Camille e URL final do Pages | Confirmado no `gh auth login`. | Camille | open | — |

@@ -1,0 +1,10 @@
+{
+  "name": "trama",
+  "private": true,
+  "scripts": {
+    "sync-tokens": "cp design/tokens/tokens.css site/assets/tokens.css",
+    "site": "npm run sync-tokens && npx --yes serve@14.2.4 site",
+    "app": "npm --prefix app run dev",
+    "build": "npm --prefix app run build"
+  }
+}
