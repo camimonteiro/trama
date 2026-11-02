@@ -237,7 +237,7 @@ function start() {
   if (!RM) {
     slides.forEach((s) => {
       const h = s.querySelector('h1, h2');
-      if (h) splits.set(s, SplitText.create(h, { type: 'words', mask: 'words' }));
+      if (h) splits.set(s, SplitText.create(h, { type: 'words', mask: 'words', wordsClass: 'word' }));
     });
   }
   const n = parseInt(location.hash.replace('#/', ''), 10) - 1;
