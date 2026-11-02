@@ -6,6 +6,7 @@
   <title>Trama — hub do projeto</title>
   <meta name="description" content="Hub do processo de desenvolvimento da Trama, projeto final do curso Salto (Aprender Design).">
   <link rel="stylesheet" href="assets/tokens.css">
+  <script>if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -49,10 +50,7 @@
     .btn.ghost { border: 1px solid var(--color-border); color: var(--color-text); background: var(--color-surface); }
     .weave { position: absolute; right: -60px; top: 40px; width: 420px; opacity: .9; pointer-events: none; display: none; }
     @media (min-width: 960px) { .weave { display: block; } }
-    .weave path { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 2.4s var(--ease-out) forwards; }
-    .weave path:nth-child(2) { animation-delay: .2s } .weave path:nth-child(3) { animation-delay: .4s }
-    .weave path:nth-child(4) { animation-delay: .6s } .weave path:nth-child(5) { animation-delay: .8s }
-    @keyframes draw { to { stroke-dashoffset: 0; } }
+    .weave path { fill: none; stroke-width: 3; stroke-linecap: round; }
 
     /* Sections */
     section { padding: var(--space-12) 0; border-top: 1px solid var(--color-border); }
@@ -74,7 +72,7 @@
 
     /* Timeline */
     .timeline { list-style: none; padding: 0; margin: 0; position: relative; }
-    .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--color-border); }
+    .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--color-border); transform-origin: top; transform: scaleY(var(--line, 1)); }
     .timeline li { position: relative; padding: 0 0 var(--space-6) var(--space-8); }
     .timeline li::before { content: ""; position: absolute; left: 0; top: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--color-surface); border: 2px solid var(--color-border); }
     .timeline li.now::before { background: var(--color-accent); border-color: var(--color-accent); box-shadow: 0 0 0 6px var(--color-accent-soft); }
@@ -91,13 +89,15 @@
 
     footer { padding: var(--space-12) 0; color: var(--color-text-muted); font-size: var(--text-sm); border-top: 1px solid var(--color-border); }
 
-    /* Reveal */
-    .reveal { opacity: 0; transform: translateY(16px); transition: opacity var(--duration-slow) var(--ease-out), transform var(--duration-slow) var(--ease-out); }
-    .reveal.in { opacity: 1; transform: none; }
+    /* Motion (GSAP). Elements start hidden only while .motion is set; it is
+       dropped if GSAP fails to load or the viewer prefers reduced motion. */
+    .motion .top, .motion .hero .eyebrow, .motion h1, .motion .lead, .motion .ctas .btn, .motion .weave,
+    .motion section h2, .motion section .sub, .motion .card, .motion .timeline li, .motion .pipeline > div { visibility: hidden; }
+    .motion .timeline { --line: 0; }
+    /* CSS transitions would fight GSAP's per-frame transforms until the entrance ends */
+    .motion .card:not(.ready), .motion .btn:not(.ready) { transition: none; }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .reveal { opacity: 1; transform: none; transition: none; }
-      .weave path { animation: none; stroke-dashoffset: 0; }
       .btn, .card { transition: none; }
     }
   </style>
@@ -137,7 +137,7 @@
       </div>
     </div>
 
-    <section id="projeto" class="reveal">
+    <section id="projeto">
       <div class="wrap">
         <h2>O projeto</h2>
         <p class="sub">Nome temporário: <strong>Trama</strong>, porque une fios: craft, dados e teoria. Problema, público e hipóteses ainda estão sendo definidos e ficam versionados no repositório.</p>
@@ -149,7 +149,7 @@
       </div>
     </section>
 
-    <section id="artefatos" class="reveal">
+    <section id="artefatos">
       <div class="wrap">
         <h2>Artefatos</h2>
         <p class="sub">Decks, documentos, decisões e protótipos. Para adicionar um item, edite <code>site/artifacts.json</code> (skill <code>publish-artifact</code>).</p>
@@ -157,7 +157,7 @@
       </div>
     </section>
 
-    <section id="produto" class="reveal">
+    <section id="produto">
       <div class="wrap">
         <h2>Produto</h2>
         <p class="sub">A ferramenta em desenvolvimento é publicada automaticamente a cada merge na <code>main</code>.</p>
@@ -170,7 +170,7 @@
       </div>
     </section>
 
-    <section id="marcos" class="reveal">
+    <section id="marcos">
       <div class="wrap">
         <h2>Marcos</h2>
         <p class="sub">As datas dependem do contexto do curso Salto (<a data-repo-path="management/open-questions.md" href="#">OQ-001</a>). Nada foi estimado sem informação.</p>
@@ -184,7 +184,7 @@
       </div>
     </section>
 
-    <section id="esteira" class="reveal">
+    <section id="esteira">
       <div class="wrap">
         <h2>Esteira de desenvolvimento</h2>
         <p class="sub">Como o trabalho sai de uma ideia e chega a esta página. Detalhes no <a href="decks/onboarding/">deck</a> e no <a data-repo-path="CONTRIBUTING.md" href="#">CONTRIBUTING</a>.</p>
@@ -200,7 +200,7 @@
       </div>
     </section>
 
-    <section id="time" class="reveal">
+    <section id="time">
       <div class="wrap">
         <h2>Time</h2>
         <p class="sub">Dupla de product design e mentoria.</p>
@@ -217,6 +217,8 @@
     <div class="wrap">Trama (nome temporário) · Projeto final do curso Salto, Aprender Design · Identidade visual provisória.</div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" onerror="document.documentElement.classList.remove('motion')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" onerror="document.documentElement.classList.remove('motion')"></script>
   <script>
     // Theme toggle, remembered per viewer
     (function () {
@@ -238,6 +240,41 @@
       a.href = owner ? `${repo}/${p.includes('.') ? 'blob' : 'tree'}/main/${p}` : `../${p}`;
     });
 
+    // Motion: short, eased entrances; nothing loops except the hero weave drifting
+    const motion = document.documentElement.classList.contains('motion') && window.gsap && window.ScrollTrigger;
+    // Re-enable hover transitions once GSAP lets go of the transform
+    const settle = els => { gsap.set(els, { clearProps: 'transform' }); gsap.utils.toArray(els).forEach(el => el.classList.add('ready')); };
+    if (motion) {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.defaults({ ease: 'power3.out', duration: 0.8 });
+
+      // Header and hero
+      gsap.from('.top', { autoAlpha: 0, yPercent: -100, duration: 0.6 });
+      gsap.timeline({ delay: 0.15 })
+        .from('.hero .eyebrow', { autoAlpha: 0, y: 12 })
+        .from('h1', { autoAlpha: 0, y: 28, duration: 1 }, '-=0.6')
+        .from('.lead', { autoAlpha: 0, y: 20 }, '-=0.7')
+        .from('.ctas .btn', { autoAlpha: 0, y: 16, stagger: 0.08, onComplete: () => settle('.ctas .btn') }, '-=0.6');
+
+      // Weave: threads draw in, then drift gently
+      gsap.set('.weave', { visibility: 'visible' });
+      document.querySelectorAll('.weave path').forEach((p, i) => {
+        const len = p.getTotalLength();
+        gsap.fromTo(p, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut', delay: 0.3 + i * 0.15 });
+        gsap.to(p, { y: i % 2 ? 6 : -6, duration: 3 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2 });
+      });
+
+      // Sections: heading and copy, then their items
+      document.querySelectorAll('main section').forEach(s => {
+        const items = s.querySelectorAll(':scope .grid:not(#artifacts) > .card, :scope .wrap > .card, .timeline li, .pipeline > div');
+        const tl = gsap.timeline({ scrollTrigger: { trigger: s, start: 'top 80%', once: true } })
+          .from(s.querySelectorAll('h2, .sub'), { autoAlpha: 0, y: 20, stagger: 0.1 });
+        if (items.length) tl.from(items, { autoAlpha: 0, y: 24, stagger: 0.08, onComplete: () => settle(items) }, '-=0.5');
+        const line = s.querySelector('.timeline');
+        if (line) tl.to(line, { '--line': 1, duration: 1.2, ease: 'power2.inOut' }, '<');
+      });
+    }
+
     // Artifacts from artifacts.json
     const labels = { deck: 'Deck', doc: 'Documento', decision: 'Decisões', prototype: 'Protótipo', link: 'Link' };
     fetch('artifacts.json').then(r => r.json()).then(items => {
@@ -254,13 +291,13 @@
         a.append(tag, h, p, m);
         el.append(a);
       }
+      if (motion) ScrollTrigger.batch(el.children, {
+        start: 'top 90%', once: true,
+        onEnter: b => gsap.from(b, { autoAlpha: 0, y: 24, stagger: 0.08, onComplete: () => settle(b) })
+      });
     }).catch(() => {
       document.getElementById('artifacts').innerHTML = '<p class="sub">Não foi possível carregar os artefatos.</p>';
     });
-
-    // Reveal on scroll
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach(s => io.observe(s));
   </script>
 </body>
 </html>
