@@ -18,6 +18,7 @@ Use o [`_template.md`](_template.md). Toda decisão costuma nascer de uma [quest
 | [ADR-0005](ADR-0005-language-policy.md) | Política de idioma | aceita |
 | [ADR-0006](ADR-0006-project-management-github-projects.md) | Gestão no GitHub Projects | aceita |
 | [ADR-0007](ADR-0007-public-repo-no-license.md) | Repositório público, sem licença por ora | aceita |
+| [ADR-0008](ADR-0008-admin-merge-bypass.md) | Admin pode fazer merge de PR sem aprovação | aceita |
 | [DDR-0001](DDR-0001-temporary-name.md) | Nome temporário: Trama | aceita |
 | [DDR-0002](DDR-0002-provisional-visual-identity.md) | Identidade visual provisória (terracota) | aceita |
 | [DDR-0003](DDR-0003-decks-html-gsap.md) | Decks em HTML + GSAP em `site/decks/<name>/` | aceita |
