@@ -10,7 +10,7 @@
 - Commits no padrão Conventional Commits, em inglês.
 - PR com template, **1 aprovação** obrigatória, review prévia por um agente de AI.
 - **Squash merge**.
-- Ruleset na `main`: sem push direto, PR obrigatório e 1 aprovação.
+- Ruleset na `main`: sem push direto, PR obrigatório e 1 aprovação. Exceção para admins ao fazer merge de PR: [ADR-0008](ADR-0008-admin-merge-bypass.md).
 
 ## Embasamento
 - Conventional Commits: https://www.conventionalcommits.org/pt-br/v1.0.0/

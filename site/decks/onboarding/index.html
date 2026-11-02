@@ -166,7 +166,7 @@ c1 chore: initial structure</span></pre>
         <div>
           <p class="kicker a">Conceito 6</p>
           <h2>Review</h2>
-          <p class="lead a">Primeiro um agente de AI revisa o diff. Depois a outra pessoa designer lê, comenta e aprova. Sem aprovação, a <code>main</code> não aceita o merge.</p>
+          <p class="lead a">Primeiro um agente de AI revisa o diff. Depois a outra pessoa designer lê, comenta e aprova. Sem aprovação, a <code>main</code> não aceita o merge. Exceção: a admin pode fazer o merge sem aprovação para não travar o time.</p>
         </div>
       </div>
     </section>
@@ -320,7 +320,7 @@ c1 chore: initial structure</span></pre>
           <div class="step"><strong>Review</strong><span>AI + 1 aprovação</span></div>
           <div class="step"><strong>Deploy</strong><span>squash → Pages</span></div>
         </div>
-        <p class="small a" style="margin-top:var(--space-4)">A <code>main</code> é protegida: sem push direto, sem merge sem aprovação.</p>
+        <p class="small a" style="margin-top:var(--space-4)">A <code>main</code> é protegida: sem push direto e sem merge sem aprovação (exceto pela admin, via PR).</p>
       </div>
     </section>
 
