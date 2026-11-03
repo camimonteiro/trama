@@ -19,9 +19,10 @@ O **Claude** é a AI principal do time. Mesmo assim, o projeto continua **o mais
 | Nenhum agente principal | Neutralidade total | Sem padrão de trabalho; mais atrito entre as pessoas do time |
 
 ## Embasamento
-- **Fato (decisão do time):** o Claude é a AI principal, e o time quer testar o desempenho em diferentes modelos.
+- **Fato (decisão do time):** a Camille e o Lucas usam o Claude, por isso ele é a AI principal do projeto, mas não a única. O time quer testar o desempenho em diferentes modelos.
+- **Fora de escopo:** o plano do Claude de cada pessoa. O que importa é que as duas pessoas têm acesso.
 - **Fato (repositório):** a estrutura da [ADR-0003](ADR-0003-ai-agnostic-strategy.md) já sustenta isso: `AGENTS.md` como fonte única, `CLAUDE.md` só importa o `AGENTS.md`, skills no formato aberto [Agent Skills](https://agentskills.io/specification) e chamadas de modelo do produto via `AIProvider` em `app/src/ai/`.
-- **Não respondido nesta decisão:** o plano do Claude usado por cada pessoa e se outros agentes leem `.claude/skills/` sem configuração extra. Isso foi para a [OQ-012](../open-questions.md).
+- **Não respondido nesta decisão:** como outros agentes e modelos leem as skills e qual a melhor estrutura de pastas para elas. Isso foi para a [OQ-012](../open-questions.md).
 
 ## Consequências
 - Instruções, skills e fluxos podem assumir o Claude Code como ferramenta padrão, mas o que for exclusivo dele continua marcado como **[Claude-only]** e com alternativa genérica ([ADR-0003](ADR-0003-ai-agnostic-strategy.md)).
