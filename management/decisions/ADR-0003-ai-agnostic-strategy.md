@@ -19,7 +19,7 @@ O processo é todo integrado com AI, mas o time não quer depender de uma única
 - AGENTS.md: https://agents.md
 - Memória e imports do Claude Code (`@path`): https://code.claude.com/docs/en/memory
 - Especificação Agent Skills: https://agentskills.io/specification
-- **Não verificado:** quais ferramentas leem `.claude/skills/` sem configuração extra. Há relatos não oficiais de que versões recentes do Claude Code leem o AGENTS.md diretamente. Ver [OQ-007](../open-questions.md).
+- **Não verificado:** quais ferramentas leem `.claude/skills/` sem configuração extra. Há relatos não oficiais de que versões recentes do Claude Code leem o AGENTS.md diretamente. Ver [OQ-007](../open-questions.md), decidida na [ADR-0011](ADR-0011-claude-primary-agent-model-agnostic.md); o que ficou em aberto está na [OQ-012](../open-questions.md).
 
 ## Consequências
 - Trocar de agente não exige reescrever as regras do projeto.
