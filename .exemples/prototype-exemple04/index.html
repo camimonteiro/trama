@@ -1,0 +1,1517 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Prototipo IA - V4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<style>
+/* Layout: one phone on a dark stage (same frame/cursor as the Pix prototype). Only the intro and the history are blue; home and conversation are light. */
+@font-face{font-family:"Sohne";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/Sohne-Buch.woff2) format("woff2")}
+@font-face{font-family:"Sohne";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/Sohne-Kraftig.woff2) format("woff2")}
+:root{
+  --blue:#006fff; --blue2:#0051ff; --navy:#001025; --light:#ebebeb; --ink:#070707; --muted:#708aad;
+  --glass:linear-gradient(180deg,rgba(192,185,185,.21) 0%,rgba(233,233,233,.30) 100%);
+  --ios:cubic-bezier(.32,.72,0,1); --out:cubic-bezier(.16,1,.3,1); --inout:cubic-bezier(.65,0,.35,1);
+  --sw:402px; --sh:874px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0a0b0f;overflow:hidden;overscroll-behavior:none}
+body{font-family:"Sohne",-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#000;user-select:none;-webkit-user-select:none;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation;outline:none;text-align:left}
+button:focus-visible{outline:2px solid rgba(0,111,255,.6);outline-offset:2px}
+svg{display:block}
+
+/* ---------- stage ---------- */
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0a0b0f}
+#stage::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 40%,rgba(0,80,255,.16),transparent 70%)}
+#device{position:relative;width:calc(var(--sw) + 24px);height:calc(var(--sh) + 24px);border-radius:74px;background:#111;box-shadow:0 0 0 2px #2a2c33,0 0 0 4px #0b0b0d,0 40px 100px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.06);transform-origin:center;flex:none}
+#screen{position:absolute;left:12px;top:12px;width:var(--sw);height:var(--sh);border-radius:62px;overflow:hidden;clip-path:inset(0 round 62px);contain:paint;background:var(--navy);isolation:isolate}
+#screen::after{content:"";position:absolute;inset:0;border-radius:62px;box-shadow:inset 0 0 0 1.5px #111;pointer-events:none;z-index:200}
+body.mobile #screen::after{display:none}
+body.mobile #stage{background:#000}
+body.mobile #stage::before{display:none}
+body.mobile #device{width:var(--sw);height:var(--sh);border-radius:0;background:none;box-shadow:none}
+body.mobile #island{display:none}
+body.mobile #screen{left:0;top:0;border-radius:0;clip-path:inset(0)}
+#hint{position:fixed;left:0;right:0;bottom:22px;text-align:center;color:rgba(255,255,255,.35);font-size:13px;letter-spacing:.01em;pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif}
+body.mobile #hint{display:none}
+#flows{position:fixed;right:22px;top:20px;display:flex;gap:8px;z-index:50;font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif}
+#flows button{color:rgba(255,255,255,.55);font-size:13px;padding:8px 13px;border-radius:99px;border:1px solid rgba(255,255,255,.12);transition:.2s;white-space:nowrap;background:rgba(255,255,255,.02)}
+#flows button:hover{color:#fff;border-color:rgba(255,255,255,.35)}
+#flows button.on{color:#fff;background:var(--blue);border-color:var(--blue)}
+#flows button b{font-weight:600;opacity:.6;margin-right:5px}
+#flows button.on b{opacity:.85}
+#flows #restart{margin-left:6px}
+body.mobile #flows{right:12px;top:10px;gap:6px}
+body.mobile #flows button{font-size:11px;padding:7px 10px}
+
+/* ---------- layers ---------- */
+.layer{position:absolute;inset:0;width:var(--sw);height:var(--sh)}
+.hidden{display:none!important}
+#island{position:absolute;left:50%;top:11px;width:81px;height:36px;margin-left:-40.5px;border-radius:18px;background:#000;z-index:60;pointer-events:none}
+#status{position:absolute;left:0;top:0;width:402px;height:54px;z-index:50;pointer-events:none;color:#fff;transition:color .6s}
+#status.dark{color:#000}
+#status .time{position:absolute;left:47.5px;top:21px;width:50px;text-align:center;font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,sans-serif;font-weight:500;font-size:16px;letter-spacing:-.32px;line-height:1.2;white-space:nowrap}
+#status .loc{position:absolute;left:98px;top:24.4px;width:21.4px;height:19.2px}
+#status .cell{position:absolute;left:271.67px;top:25.33px;width:22px;height:15px}
+#status .cell i{position:absolute;width:4px;border-radius:2px;background:currentColor}
+#status .cell .b1{left:0;top:8px;height:7px}#status .cell .b2{left:6px;top:5.67px;height:9.33px}#status .cell .b3{left:12.33px;top:3px;height:12px}#status .cell .b4{left:18.67px;top:0;height:15px}
+#status .wifi{position:absolute;left:302px;top:25px;width:21px;height:17px}
+#status .bat{position:absolute;left:331.34px;top:24.67px;width:32.33px;height:15px}
+#status .bat i{position:absolute;background:currentColor}
+#status .bat .body{left:0;top:0;width:29.33px;height:15px;border-radius:5px;opacity:.3}
+#status .bat .lvl{left:0;top:0;width:26.33px;height:15px;border-radius:5px 0 0 5px}
+#status .bat .nub{left:30.33px;top:5px;width:2px;height:5px;border-radius:0 2px 2px 0;opacity:.3}
+
+/* ---------- blue world: video crop + Figma treatment (intro, thinking circle, history) ---------- */
+.blueBg{position:absolute;inset:0;background:var(--navy);overflow:hidden}
+.blueBg canvas{position:absolute;left:0;top:0;width:1238px;height:1520px;transform-origin:0 0;transform:matrix(-0.97,0.25,0.25,0.97,812.27,-637);display:block}
+.blueBg .tint{position:absolute;inset:0;background:rgba(0,61,110,.2)}
+.blob{position:absolute;border-radius:50%;filter:blur(150px);pointer-events:none;transform:translateZ(0)}
+.blob.b1{left:-430px;top:820px;width:964px;height:878px;background:#1532e2}
+.blob.b2{left:-928px;top:-487px;width:964px;height:964px;background:#85d1ec}
+.blob.b3{left:424px;top:-202px;width:964px;height:964px;background:#5360ff}
+/* the gradient line on the edge: only during the intro build-up (draws in, drifts, glows, then leaves) */
+@property --ringA{syntax:"<angle>";inherits:false;initial-value:0deg}
+@property --ringS{syntax:"<angle>";inherits:false;initial-value:0deg}
+#ring,#ringGlow{position:absolute;inset:0;border-radius:62px;padding:5px;pointer-events:none;z-index:4;opacity:0;
+  background:conic-gradient(from var(--ringA),#a7d8ff 0%,#79cfe6 24%,#000861 52%,#002683 76%,#a7d8ff 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+#ringGlow{padding:9px;inset:-3px;filter:blur(10px);z-index:3}
+#ring.on{animation:ringIn 1.6s var(--out) forwards,ringTurn 9s linear infinite}
+#ringGlow.on{animation:ringInGlow 1.6s var(--out) forwards,ringTurn 9s linear infinite}
+#ring.off,#ringGlow.off{transition:opacity .9s;opacity:0!important}
+@keyframes ringIn{from{opacity:0}to{opacity:1}}
+@keyframes ringInGlow{from{opacity:0}to{opacity:.8}}
+@keyframes ringTurn{from{--ringA:0deg}to{--ringA:360deg}}
+
+/* ---------- app (light world) — slides right to reveal the history underneath ---------- */
+#app{position:absolute;inset:0;z-index:5;background:var(--light);transform:translateX(0);transition:transform .6s var(--ios),border-radius .6s var(--ios);will-change:transform;overflow:hidden;border-radius:0}
+#app.shifted{transform:translateX(330px);border-radius:64px;box-shadow:-30px 0 80px rgba(0,10,60,.45)}
+#app.shifted::after{content:"";position:absolute;inset:0;z-index:150;cursor:pointer}
+#lightL{z-index:1;background:var(--light);overflow:hidden}
+/* os gradientes têm o centro FORA da tela (160px além da borda); só o halo entra, ~170px no máximo. O miolo (x 180–220 / y 200–670) nunca recebe cor.
+   lb1 desliza ao longo da borda de baixo; lb2 desce e sobe colado na borda esquerda; lb3 respira no canto superior direito. */
+/* V2: as duas elipses do Figma (14549 em cima, 14548 embaixo), estáticas; o SVG já traz o blur de 100 e 200px de folga em volta */
+#lightL .le{position:absolute;max-width:none;pointer-events:none;display:block}
+#lightL .le1{left:-1122px;top:-687px;width:1364px;height:1364px}
+#lightL .le2{left:-630px;top:590px;width:1364px;height:1278px}
+/* V3: as esferas da home passeiam pelas bordas — a de cima atravessa da esquerda pra direita e volta (26s por trecho), a de baixo faz o caminho
+   contrário (32s), as duas em ease-in-out, sem nunca sincronizar. São blocos de ~1360px desfocados: o passeio precisa ser de centenas de px pra se notar.
+   Só transform: o crossfade pra conversa continua na opacidade */
+#lightL .le1{animation:orbTop 26s ease-in-out infinite alternate;will-change:transform}
+#lightL .le2{animation:orbBottom 32s ease-in-out infinite alternate;animation-delay:-11s;will-change:transform}
+/* a de cima contorna o canto superior esquerdo: quanto mais anda pra direita, mais sobe — o centro fica sempre ~440px fora da tela e só a borda do brilho entra.
+   A de baixo corre por baixo da borda inferior, sem subir nem crescer */
+@keyframes orbTop{0%{transform:translate(0,0)}35%{transform:translate(240px,-200px)}70%{transform:translate(440px,-340px)}100%{transform:translate(600px,-430px)}}
+@keyframes orbBottom{0%{transform:translate(300px,20px)}50%{transform:translate(60px,0)}100%{transform:translate(-200px,20px)}}
+/* conversa: fundo #f0f1f1 com as 3 elipses do Figma (2927-15533); as duas camadas trocam em crossfade */
+#lightL{transition:background-color .6s var(--inout)}
+#lightL .le{transition:opacity .6s var(--inout)}
+#lightL .cv{opacity:0}
+#lightL.conv{background:#f0f1f1}
+#lightL.conv .hm{opacity:0}
+#lightL.conv .cv{opacity:1}
+#lightL .cv1{left:-1118px;top:-707px;width:1364px;height:1364px}
+#lightL .cv2{left:-630px;top:620px;width:1364px;height:1278px}
+#lightL .cv3{left:-79px;top:543px;width:942px;height:942px}
+/* blue circle that grows behind the icon while thinking (same video, clipped) */
+#thinkBlue{position:absolute;left:53px;top:272px;width:296px;height:296px;border-radius:50%;overflow:hidden;clip-path:circle(50% at 50% 50%);z-index:6;opacity:0;transform:scale(.2);pointer-events:none;isolation:isolate}
+#thinkBlue .blueBg{clip-path:circle(50% at 50% 50%)}
+#thinkBlue .blueBg canvas{transform:matrix(-0.97,0.25,0.25,0.97,812.27,-637) translate(-53px,-272px)}
+#thinkBlue .blob{filter:blur(90px)}
+#thinkHalo{position:absolute;left:53px;top:272px;width:296px;height:296px;border-radius:50%;z-index:5;opacity:0;pointer-events:none;background:radial-gradient(circle,rgba(0,111,255,.28),rgba(0,111,255,0) 68%);transform:scale(1.2)}
+#orbWrap{transform-origin:50% 50%}
+
+/* ---------- nav (menu · title · close) ---------- */
+.nav{position:absolute;left:20px;top:82px;width:362px;height:48px;display:flex;align-items:center;gap:8px;z-index:20}
+/* nav: na home o título fica no centro; na conversa ele desliza 70px pra esquerda e entra o chip de minimizar (Figma 2927-18101) */
+.nav #menuBtn{position:absolute;left:0;top:0}
+.nav #closeBtn{position:absolute;left:314px;top:0}
+.nav #minBtn{position:absolute;left:257px;top:0;opacity:0;transform:translateX(14px) scale(.92);filter:blur(4px);pointer-events:none;transition:opacity .2s ease-out,transform .3s var(--ios),filter .2s ease-out} /* saída rápida, sem atraso */
+.nav #minBtn .min{position:relative;display:block;width:25.82px;height:26px} /* Figma 3062-26843: duas setas li:arrow-up-right apontando pro centro (recolher) */
+.nav #minBtn .min img{position:absolute;display:block}
+.nav #minBtn .min .a{right:.807px;top:.807px;transform:rotate(180deg)}  /* em cima à direita, apontando pra baixo-esquerda */
+.nav #minBtn .min .b{left:.807px;bottom:.807px}                         /* embaixo à esquerda, apontando pra cima-direita */
+.nav.conv #minBtn{opacity:1;transform:none;filter:blur(0);pointer-events:auto;transition:opacity .5s cubic-bezier(.45,0,.55,1) .22s,transform .7s cubic-bezier(.22,1,.36,1) .18s,filter .5s ease-out .22s} /* V3: entra devagar e macio — depois que o título começa a abrir espaço (≈0,2s), desliza 14px, cresce de 92% e o desfoque se dissolve em 0,5–0,7s */
+/* V3: card do carrossel → balão do usuário. Um fantasma sai do card e vira o balão: caixa (posição, tamanho, raio) na curva iOS; a face do card some, o vidro branco e o texto da pergunta chegam */
+.ghost{position:absolute;z-index:18;overflow:hidden;border-radius:34.364px;pointer-events:none}
+.ghost .gface{position:absolute;left:0;top:0;margin:0}
+.ghost .gbg{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.4),#fff);opacity:0}
+.ghost .gtx{position:absolute;left:18px;top:18px;font-size:14px;line-height:20px;letter-spacing:-.28px;color:#212121;opacity:0}
+.nav .ttl{position:absolute;left:0;top:0;width:362px;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:transform .6s var(--ios)}
+.nav.conv .ttl{transform:translateX(-70px)}
+.nav .tin{display:flex;align-items:center;gap:8px;position:relative;top:.5px;font-weight:600;font-size:18px;line-height:1;letter-spacing:-.36px;white-space:nowrap;color:#26384a}
+.nav .tin #navSpark{width:23px;height:23px;display:block;flex:none;transform:rotate(90deg)}
+.chip img{display:block}
+.chip{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--glass);box-shadow:inset 1px 1px 1px rgba(255,255,255,.45);backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);color:var(--ink);transition:transform .2s var(--out);flex:none}
+.chip:active{transform:scale(.92)}
+.chip svg{width:24px;height:24px}
+.chip.glass{color:#fff;box-shadow:inset 1px 1px 1px rgba(255,255,255,.28)}
+/* scrim claro atrás do input: afasta o campo do conteúdo que vai chegando */
+#scrim{position:absolute;left:0;right:0;bottom:0;height:180px;z-index:14;pointer-events:none;background:linear-gradient(180deg,rgba(240,241,241,0) 0%,#f0f1f1 60%);opacity:0;transition:opacity .5s} /* Figma 2927-15567 */
+#scrim.on{opacity:1}
+
+/* ---------- intro ---------- */
+#introL{z-index:2;pointer-events:none}
+#introC{position:absolute;left:20px;top:346px;width:362px;display:flex;flex-direction:column;align-items:center;gap:21px}
+.ico{position:relative;width:128px;height:128px}
+.ico img,.ico .fb{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.ico .glow{position:absolute;left:50%;top:50%;width:170%;height:170%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(170,215,255,.55),rgba(90,150,255,.18) 45%,transparent 70%);pointer-events:none}
+.ico .spark{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#dff1ff;box-shadow:0 0 8px #9fd0ff;opacity:0;pointer-events:none}
+.ico.pulse img,.ico.pulse .fb{animation:icoPulse 2.4s ease-in-out infinite,icoLight 5.2s ease-in-out infinite}
+/* o ícone 3D vive brilhando: a luz gira (hue), o brilho respira e o halo muda de cor */
+.ico img,#homeIco img{animation:icoLight 5.2s ease-in-out infinite;will-change:filter}
+@keyframes icoLight{
+  0%  {filter:brightness(1) saturate(1) hue-rotate(0deg) drop-shadow(0 0 6px rgba(120,190,255,.35))}
+  22% {filter:brightness(1.14) saturate(1.18) hue-rotate(-8deg) drop-shadow(0 0 14px rgba(140,230,255,.6))}
+  48% {filter:brightness(.96) saturate(1.05) hue-rotate(6deg) drop-shadow(0 0 8px rgba(80,140,255,.4))}
+  72% {filter:brightness(1.18) saturate(1.22) hue-rotate(-3deg) drop-shadow(0 0 18px rgba(170,240,255,.65))}
+  100%{filter:brightness(1) saturate(1) hue-rotate(0deg) drop-shadow(0 0 6px rgba(120,190,255,.35))}}
+.ico.pulse .glow{animation:glowPulse 2.4s ease-in-out infinite}
+@keyframes icoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+@keyframes glowPulse{0%,100%{opacity:.75;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}
+#greet{font-weight:600;font-size:28.74px;line-height:33px;letter-spacing:-.57px;color:#fff;text-align:center;white-space:nowrap}
+#greet span{display:inline-block;will-change:transform,opacity}
+
+/* ---------- home (light) ---------- */
+#homeL{z-index:8}
+/* Home V2 — Figma 2927-14518. O ícone 3D da intro voa até o sparkle do título da nav (#navSpark) e some nele; #homeIco é só o "avião" desse voo */
+#homeIco{position:absolute;left:0;top:0;width:128px;height:128px;transform-origin:0 0;z-index:21;opacity:0;pointer-events:none}
+#homeIco img,#homeIco .fb{width:100%;height:100%;object-fit:contain}
+#homeTitle{position:absolute;left:22px;top:195px;width:196px;font-weight:600;font-size:32px;line-height:normal;letter-spacing:-.64px;color:#26384a}
+#homeTitle span{display:inline-block}
+#carousel{position:absolute;left:0;top:288px;width:402px;display:flex;align-items:center;gap:4px;padding:0 20px;scroll-padding-left:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab;touch-action:pan-x}
+#carousel::-webkit-scrollbar{display:none}
+#carousel.dragging{cursor:grabbing;scroll-snap-type:none}
+#carousel.dragging *{pointer-events:none}
+.card{position:relative;flex:none;width:170px;height:200px;border-radius:34.364px;scroll-snap-align:start;background:rgba(233,233,233,.2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),inset 1px 1px 1px rgba(255,255,255,.5);-webkit-backdrop-filter:blur(4px) saturate(1.2);backdrop-filter:blur(4px) saturate(1.2);color:#26384a;transition:transform .25s var(--out)} /* V4: cards 170×200 (o azul 198), 4px entre eles (Figma 3066-27466) */
+/* GLASS do Figma, medido no render: topo ~2% mais escuro, canto inferior direito mais claro; o card ao lado do azul refrata o azul na borda esquerda */
+.card{background:linear-gradient(180deg,rgba(0,0,0,.017),rgba(0,0,0,0) 60px),linear-gradient(315deg,rgba(255,255,255,.2),rgba(255,255,255,0) 35%),rgba(233,233,233,.2)}
+.card.refract{background:linear-gradient(90deg,rgba(0,111,255,.18) 0,rgba(0,111,255,.16) 4px,rgba(0,111,255,.077) 16px,rgba(0,111,255,.02) 28px,rgba(0,111,255,0) 38px),linear-gradient(180deg,rgba(0,0,0,.017),rgba(0,0,0,0) 60px),linear-gradient(315deg,rgba(255,255,255,.2),rgba(255,255,255,0) 35%),rgba(233,233,233,.2)}
+.card.blue{height:198px;background:#006fff;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:#e5f4ff}
+.card:active{transform:scale(.97)}
+.card .cimg{position:absolute;overflow:hidden;pointer-events:none}
+.card .cimg img{position:absolute;max-width:none;display:block}
+.card .cgo{position:absolute;width:32px;height:32px;border-radius:133.333px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(192,185,185,.21),rgba(233,233,233,.3));box-shadow:inset 1px 1px 1px rgba(255,255,255,.45)}
+.card .cgo img{width:16px;height:16px;display:block}
+.card .ct{position:absolute;top:136px;font-weight:400;font-size:14px;line-height:normal;letter-spacing:-.42px} /* V4: textos dos cards viraram convites de 4 linhas, em 14px */
+#prompts{position:absolute;left:20px;top:574px;display:flex;flex-direction:column;gap:8px;width:249px}
+#prompts button{display:flex;align-items:center;gap:10px;padding:10px;width:100%;color:#26384a;font-size:16px;line-height:normal;letter-spacing:-.32px;border-radius:14px;transition:background .2s,transform .2s var(--out);white-space:nowrap}
+#prompts button img{width:20px;height:20px;flex:none;display:block}
+#prompts button:active{transform:scale(.98);background:rgba(0,0,0,.05)}
+
+/* ---------- placeholder entry screens (flows 2 & 3, to be designed) ---------- */
+/* ---- entry point fluxo 2: home Neon (2865-34701) ---- */
+#entry2{z-index:12;background:#eef0f4;color:#0b1020;font-family:"Sohne",sans-serif;overflow:hidden}
+#entry2 button{font-family:inherit;border:0;cursor:pointer}
+.e-cards{position:absolute;left:8px;right:8px;top:-20px;display:flex;gap:8px}
+.e-card{flex:1;background:#fff;border-radius:24px;padding:18px 16px 16px;min-height:218px;position:relative}
+.e-art{height:100px;border-radius:16px;position:relative;overflow:hidden}
+.e-cardimg{margin:0 6px;height:90px;border-radius:14px;background:linear-gradient(135deg,#0a2cff,#2fa8ff 55%,#5fd8ff);box-shadow:0 10px 24px rgba(10,44,255,.25)}
+.e-time{position:absolute;left:28px;top:10px;color:#fff;font-weight:600;font-size:16px}
+.e-neon{position:absolute;right:14px;top:8px;color:#fff;font-weight:600;font-size:18px;letter-spacing:-.5px;font-style:italic}
+.e-chip{position:absolute;left:12px;top:40px;width:18px;height:14px;border:1.5px solid rgba(255,255,255,.8);border-radius:4px}
+.e-cofre{margin:0 6px;height:90px;border-radius:14px;background:#f3f4f7;display:grid;place-items:center}
+.e-cube{width:46px;height:46px;border-radius:10px;background:linear-gradient(145deg,#8fd9ff,#1766ff 70%,#0a2cff);box-shadow:0 10px 20px rgba(10,44,255,.25),inset 0 0 0 2px rgba(255,255,255,.35);transform:rotate(-8deg)}
+.e-lbl{margin-top:16px;font-size:16px;color:#4f6ea8}
+.e-val{margin-top:4px;font-size:15px;color:#6b7386}
+.e-btn{display:block;width:100%;margin-top:22px;height:44px;border-radius:22px;background:#eef0f4;color:#0f77ff;font-weight:600;font-size:16px}
+.e-tx{position:absolute;left:8px;right:8px;top:230px;background:#fff;border-radius:24px;padding:18px 18px 12px}
+.e-tx h3{margin:0 0 10px;font-size:19px;font-weight:600;letter-spacing:-.2px}
+.e-row{display:flex;align-items:center;gap:16px;height:84px}
+.e-ic{width:56px;height:56px;border-radius:50%;background:#eef0f4;display:grid;place-items:center;color:#0f77ff;flex:none}
+.e-ic svg{width:22px;height:22px}
+.e-txt{flex:1;display:flex;flex-direction:column;gap:3px}.e-txt b{font-size:17px;font-weight:400}.e-txt small{font-size:13px;color:#6b7386}
+.e-amt{text-align:right;display:flex;flex-direction:column;gap:3px}.e-amt b{font-size:17px;font-weight:600}.e-amt small{font-size:13px;color:#6b7386}
+.e-in{color:#19b24a;font-weight:700}.e-out{color:#9aa3b5;font-weight:700}
+.e-all{margin-top:4px}
+.e-banner{position:absolute;left:6px;right:6px;top:598px;height:96px;border-radius:4px 32px 32px 32px;background:#001f60;color:#fff;display:flex;align-items:center;gap:10px;padding:20px;text-align:left;transition:transform .2s var(--out)} /* Figma 2865-34807: raio 4 no canto superior esquerdo, 32 nos demais */
+.e-banner:active{transform:scale(.98)}
+.e-banner>div{flex:1;display:flex;flex-direction:column;gap:2px}.e-banner b{font-size:18px;font-weight:600;letter-spacing:-.36px;line-height:normal}.e-banner small{font-size:12px;line-height:1.3;letter-spacing:-.24px;color:#fff;opacity:.6}
+.e-spark{width:56px;height:56px;border-radius:50%;background:#133c94;display:grid;place-items:center;flex:none}.e-spark svg{width:24px;height:24px;color:#fff;fill:#fff}
+.e-x{width:48px;height:48px;margin-right:-12px;display:grid;place-items:center;font-size:22px;line-height:1;color:#fff}
+.e-promo{position:absolute;left:8px;right:8px;top:704px;height:230px;border-radius:24px;overflow:hidden}
+.e-photo{position:absolute;inset:0;background:radial-gradient(60% 60% at 45% 35%,#d7b98c,#6b4a2e 60%,#3a2a1d);filter:saturate(.9)}
+.e-px{position:absolute;right:14px;top:18px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.3);backdrop-filter:blur(10px)}
+.e-tab{position:absolute;left:28px;right:28px;top:772px;display:flex;align-items:center;justify-content:space-between}
+.e-tabs{height:80px;width:240px;border-radius:40px;background:rgba(255,255,255,.55);backdrop-filter:blur(20px);display:flex;align-items:center;padding:0 8px;gap:4px}
+.e-tabs i{flex:1;height:64px;border-radius:32px;display:grid;place-items:center;color:#0b1020}.e-tabs i.on{background:#e3e6ec}.e-tabs svg{width:22px;height:22px}
+.e-ai{width:86px;height:80px;border-radius:40px;background:#0f77ff;display:grid;place-items:center;color:#fff;box-shadow:0 10px 24px rgba(15,119,255,.35)}.e-ai svg{width:24px;height:24px;fill:#fff}
+/* ---- entry point pela FAQ: tela Ajuda do app (Figma 2734-29631). O frame tem 1124 de altura: a tela rola dentro do celular ---- */
+@font-face{font-family:"Sohne Halbfett";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/Sohne-Halbfett.otf) format("opentype")}
+#faqL{z-index:12;background:#f0f1f1}
+#faqScroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;touch-action:pan-y;overscroll-behavior:contain}
+#faqScroll::-webkit-scrollbar{display:none}
+#faqC{position:relative;width:402px;height:1124px}
+.f-hd{position:absolute;left:20px;top:82px;height:48px;display:flex;align-items:center;gap:8px}
+.f-back{width:48px;height:48px;border-radius:200px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;transition:transform .2s var(--out)}
+.f-back img{display:block;transform:rotate(180deg)} /* no Figma a seta direita vem dentro de um rotate(180) */
+.f-back:active{transform:scale(.92)}
+.f-hd h1{font-family:"Sohne Halbfett","Sohne",sans-serif;font-weight:600;font-size:24px;line-height:1;letter-spacing:-.48px;color:#000;white-space:nowrap}
+.f-ban{position:absolute;left:18px;top:164px;width:360px;height:157px;border-radius:32px;background:#006fff;color:#fff}
+.f-ban .ft{position:absolute;left:21px;top:25px;display:flex;flex-direction:column;gap:4px;white-space:nowrap}
+.f-ban .ft b{font-family:"Sohne Halbfett","Sohne",sans-serif;font-weight:600;font-size:20px;line-height:normal;letter-spacing:-.4px}
+.f-ban .ft small{font-family:"SF Compact Rounded","SF Pro Rounded",ui-rounded,-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;line-height:1.3;letter-spacing:-.28px}
+.f-ban .fimg{position:absolute;left:289px;top:21px;width:53px;height:53px;object-fit:cover;pointer-events:none}
+/* campo do banner: o que a pessoa digita vai direto pro chat da IA Neon */
+#faqAsk{position:absolute;left:12px;top:97px;width:338px;height:48px;border-radius:2000px;background:#fff;cursor:text}
+#faqIn{position:absolute;left:16px;top:0;width:271px;height:48px;border:0;outline:none;background:none;font-family:"Sohne",sans-serif;font-size:14px;line-height:1;color:rgba(0,0,0,.9);caret-color:#000;user-select:text;-webkit-user-select:text}
+#faqIn::placeholder{color:#666;opacity:1}
+#faqSend{position:absolute;left:295px;top:5px;width:38px;height:38px;border-radius:200px;background:#006fff;display:flex;align-items:center;justify-content:center;transition:transform .2s var(--out)}
+#faqSend img{display:block}
+#faqSend:active{transform:scale(.92)}
+/* busca + categorias: blocos brancos com 2px de vão; o contêiner recorta os cantos em 32 */
+.f-list{position:absolute;left:21px;top:349px;width:362px;display:flex;flex-direction:column;gap:2px;border-radius:32px;overflow:hidden}
+.f-search{position:relative;flex:none;width:362px;height:64px;background:#fff;border-radius:16px 16px 4px 4px}
+.f-search img{position:absolute;left:19px;top:20px;display:block}
+.f-search span{position:absolute;left:56px;top:24.5px;font-size:14px;line-height:1;color:#708aad;white-space:nowrap}
+.f-row{flex:none;display:flex;align-items:center;gap:10px;width:362px;padding:20px;background:#fff;border-radius:4px 4px 0 0;transition:background .2s}
+.f-row.r1{border-radius:4px}
+.f-row.rl{border-radius:0}
+.f-row:active,.f-search:active{background:#f7f8f8}
+.f-row .fic{width:48px;height:48px;border-radius:200px;background:#f0f1f1;display:flex;align-items:center;justify-content:center;flex:none}
+.f-row .fic img,.f-row>img{display:block;flex:none}
+.f-row .fl{flex:1;min-width:0;font-weight:600;font-size:16px;line-height:normal;letter-spacing:-.32px;color:#000}
+.f-libras{position:absolute;left:20px;top:989px;width:362px;border-radius:20px;text-align:center;font-weight:600;font-size:16px;line-height:1.3;letter-spacing:-.32px;color:#006fff;white-space:nowrap}
+.f-libras:active{opacity:.6}
+#phL{z-index:12;background:#e9ecf1;color:#1a1f2b;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif}
+#phL .top{position:absolute;left:0;right:0;top:54px;height:56px;display:flex;align-items:center;padding:0 20px;font-weight:700;font-size:18px;letter-spacing:-.2px;color:#2b3240}
+#phL .top span{margin-left:auto;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a93a6;border:1px dashed #b7bfcf;border-radius:8px;padding:4px 8px}
+#phL .sk{position:absolute;left:20px;right:20px;top:126px;display:flex;flex-direction:column;gap:14px}
+#phL .sk i{display:block;border-radius:12px;background:#d9dee8}
+#phL .sk .r1{height:120px;border-radius:20px}
+#phL .sk .r2{height:18px;width:60%}#phL .sk .r3{height:18px;width:40%}#phL .sk .r4{height:84px;border-radius:20px;margin-top:10px}#phL .sk .r5{height:84px;border-radius:20px}
+#phL .cta{position:absolute;left:20px;right:20px;bottom:40px;height:56px;border-radius:16px;background:#2b3240;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;transition:transform .2s var(--out)}
+#phL .cta:active{transform:scale(.97)}
+#phL .cta svg{width:22px;height:22px}
+#phL .note{position:absolute;left:20px;right:20px;bottom:108px;font-size:12px;line-height:1.4;color:#6b7386}
+
+/* ---------- input ---------- */
+/* IA/Input (Figma 3015-10718 repouso · 3015-10821 foco · 3015-11117 digitado): pílula de vidro 362×64, raio 32, flutuando a 20 da borda.
+   Com o teclado ela sobe e fica a 8 dele; com texto vira uma caixa — texto em cima (20/23, 322 de largura), "+" e enviar na linha de baixo — até 175 de altura */
+#ask{position:absolute;left:20px;bottom:20px;width:362px;height:64px;border-radius:32px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),inset 0 1px 1px rgba(255,255,255,.6);backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);color:#000;z-index:15;transition:height .5s var(--ios),bottom .5s var(--ios),background .4s;overflow:hidden} /* V3: branco 50% em vidro, o mesmo das pills (Figma 3066-27186) */
+#ask.conv{background:rgba(255,255,255,.5)} /* V3: na conversa também branco, igual às pills (3066-27186) */
+#ask.kb{bottom:326px}
+#ask.typed{height:var(--ah,115px);background:rgba(255,255,255,.62)} /* digitado: o branco fica um pouco mais denso */
+#ask .ph{position:absolute;left:24px;top:22px;font-size:16px;line-height:20px;letter-spacing:-.32px;opacity:.4;pointer-events:none;white-space:nowrap;transition:opacity .2s}
+#ask.typed .ph{opacity:0}
+/* cursor do campo vazio em foco: traço preto de 1px, 24 de altura (Vector 10) */
+#ask .cur{position:absolute;left:25px;top:19px;width:1px;height:24px;background:#000;opacity:0}
+#ask.focus .cur{opacity:1;animation:blink 1s steps(2) infinite}
+#ask.typed .cur{opacity:0!important;animation:none}
+@keyframes blink{50%{opacity:0}}
+#ask textarea{position:absolute;left:24px;top:22px;width:230px;height:20px;resize:none;border:0;background:none;color:rgba(0,0,0,.9);font:inherit;font-size:16px;line-height:20px;letter-spacing:-.32px;font-kerning:none;outline:none;caret-color:transparent;opacity:0;pointer-events:none;transition:opacity .25s;overflow:hidden}
+#ask.open textarea{opacity:1;pointer-events:auto}
+#ask.typed textarea{left:20px;top:23px;width:322px;height:var(--th,20px);opacity:1;pointer-events:auto;caret-color:#000;overflow-y:auto;scrollbar-width:none}
+#ask.typed textarea::-webkit-scrollbar{display:none}
+/* prompt → campo: as letras sobem uma a uma (250ms · entrada, cascata de 24ms) por cima do campo real; o cursor só aparece quando a última pousa */
+#ask.typing textarea{color:transparent;caret-color:transparent}
+#ask .tghost{position:absolute;left:20px;top:23px;width:322px;font-size:16px;line-height:20px;letter-spacing:-.32px;font-kerning:none;color:rgba(0,0,0,.9);white-space:pre-wrap;pointer-events:none}
+#ask .tghost span{display:inline-block;white-space:pre;opacity:0;transform:translateY(6px);animation:letterRise .25s cubic-bezier(.05,.7,.1,1) forwards;animation-delay:calc(var(--type-delay,0ms) + var(--i) * 24ms)}
+@keyframes letterRise{to{opacity:1;transform:none}}
+/* "+" (24) e o botão azul (48, a 8 da borda) ficam presos embaixo: no repouso centram na pílula, digitado descem com a caixa */
+#ask .plus{position:absolute;left:267px;bottom:20px;width:24px;height:24px;display:block}
+#ask .plus img{display:block}
+#ask .vb{position:absolute;left:307px;bottom:8px;width:48px;height:48px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;transition:transform .2s var(--out)}
+#ask .vb:active{transform:scale(.92)}
+#ask .vb>*{position:absolute;transition:opacity .2s,transform .3s var(--out)}
+#ask .vb .voice{width:20.571px;height:18px;overflow:hidden}
+#ask .vb .voice img{display:block}
+#ask .vb .send{display:block}
+#ask .vb .stop{width:20px;height:20px}
+#ask .vb .send,#ask .vb .stop{opacity:0;transform:scale(.6)}
+#ask.typed .vb .send{opacity:1;transform:none}
+#ask.typed .vb .voice{opacity:0;transform:scale(.6)}
+#ask.busy .vb .voice,#ask.busy .vb .send{opacity:0;transform:scale(.6)}
+#ask.busy .vb .stop{opacity:1;transform:none}
+/* ---------- gravação de voz (variante A1 · Batimento, de /voz-ia) ----------
+   tocar no microfone: placeholder e "+" saem (150ms, desfoque 2px); entram o ✕ num círculo de vidro (250ms, +80ms) e a linha do tempo,
+   que se revela da direita (400ms) e termina colada no check. Barras nascem na ponta direita e andam pra esquerda a 120px/s, esfriando do azul pro cinza.
+   Cancelar sai em 150ms; enviar (check) recolhe a linha pro botão em 350ms e manda a transcrição pro chat */
+#ask{--lvl:0}
+#ask .ph,#ask .plus{transition:opacity .25s,filter .25s,transform .25s}
+#ask.rec .ph,#ask.rout .ph{opacity:0;filter:blur(2px);transform:translateX(-4px);transition-duration:.15s}
+#ask.rec .plus,#ask.rout .plus{opacity:0;filter:blur(2px);pointer-events:none;transition-duration:.15s}
+#ask.rec .cur,#ask.rout .cur{opacity:0!important;animation:none}
+#ask .rcancel{position:absolute;left:12px;top:12px;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#26384a;background:var(--glass);box-shadow:inset 1px 1px 1px rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.4);-webkit-backdrop-filter:blur(24px) saturate(1.2);backdrop-filter:blur(24px) saturate(1.2);opacity:0;transform:scale(.96);pointer-events:none;transition:opacity .15s ease-out,transform .15s ease-out}
+#ask .rcancel svg{width:16px;height:16px}
+#ask .rcancel:active{transform:scale(.92)}
+#ask.rec .rcancel{opacity:1;transform:none;pointer-events:auto;transition:opacity .25s cubic-bezier(.22,1,.36,1) 80ms,transform .25s cubic-bezier(.22,1,.36,1) 80ms}
+#ask .rviz{position:absolute;left:62px;top:10px;width:236px;height:44px;opacity:0;clip-path:inset(0 0 0 100%);pointer-events:none} /* largura fixa: termina 8px antes do check */
+#ask.rec .rviz{opacity:1;clip-path:inset(0);transition:clip-path .4s cubic-bezier(.22,1,.36,1) 60ms,opacity .15s linear 60ms}
+#ask.rout .rviz{opacity:1;clip-path:inset(0)}
+#ask .vb .check{width:20px;height:20px;opacity:0;transform:scale(.6)}
+#ask.rec .vb .voice,#ask.rout .vb .voice{opacity:0;transform:scale(.6)}
+#ask.rec .vb .check,#ask.rout .vb .check{opacity:1;transform:none}
+#ask.rec .vb{box-shadow:0 0 0 calc(var(--lvl) * 7px) rgba(0,111,255,.16)}
+#ask.rec{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 0 0 1px rgba(0,111,255,calc(.12 + var(--lvl) * .35)),0 0 calc(var(--lvl) * 22px) rgba(0,111,255,calc(var(--lvl) * .22))} /* a borda do vidro respira azul com a voz */
+/* keyboard (iOS, light) */
+#kb{position:absolute;left:0;bottom:0;width:402px;height:318px;background:#d1d4db;z-index:55;transform:translateY(100%);transition:transform .5s var(--ios);padding:8px 3px 0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro","Helvetica Neue",sans-serif}
+#kb.on{transform:translateY(0)}
+#kb .krow{display:flex;justify-content:center;gap:6px;margin-bottom:11px}
+#kb .key{width:33px;height:42px;border-radius:5px;background:#fff;color:#000;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 0 #898a8d;font-weight:400;transition:background .1s}
+#kb .key:active{background:#e6e8ec}
+#kb .key.fn{background:#abb0bb;font-size:15px;width:42px}
+#kb .key.fn svg{width:22px;height:22px}
+#kb .key.space{width:184px;font-size:16px}
+#kb .key.ret{width:88px;font-size:16px;background:var(--blue);color:#fff}
+#kb .key.n123{width:42px}
+#kb .kbar{display:flex;justify-content:space-between;align-items:center;padding:0 24px;margin-top:4px;color:#000;opacity:.8}
+#kb .kbar svg{width:26px;height:26px}
+#kb .hi{position:absolute;left:134px;bottom:8px;width:134px;height:5px;border-radius:3px;background:#000}
+
+/* ---------- thinking orb + pill ---------- */
+#thinkL{z-index:7;pointer-events:none}
+#orbWrap{position:absolute;left:134.5px;top:353px;width:133px;height:133px;border-radius:50%;overflow:hidden;opacity:0;transform:scale(.6);isolation:isolate}
+#orbWrap video{position:absolute;left:-65px;top:-65px;width:263px;height:263px;object-fit:cover}
+#orbWrap .t1{position:absolute;inset:0;background:#001eff;mix-blend-mode:hue}
+#orbWrap .t2{position:absolute;inset:0;background:linear-gradient(180deg,#18ffe4,#0a0064);mix-blend-mode:soft-light}
+#orbWrap .t3{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(26,115,232,0) 70%,#1a73e8 100%);mix-blend-mode:multiply}
+#orbWrap .t4{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 18px rgba(255,255,255,.35)}
+@property --pillA{syntax:"<angle>";inherits:false;initial-value:0deg}
+#pill{position:absolute;left:0;right:0;margin:0 auto;width:max-content;top:507px;height:38px;padding:0 20px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:-.24px;color:var(--ink);background:rgba(255,255,255,.5);opacity:0;transform:translateY(8px);white-space:nowrap}
+#pill::before{content:"";position:absolute;inset:-1px;border-radius:99px;padding:1.2px;background:conic-gradient(from var(--pillA),#00189c,#006fff 25%,rgba(255,255,255,.2) 50%,#00eaff 75%,#006fff 90%,#00189c);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:pillSpin 3s linear infinite}
+@keyframes pillSpin{to{--pillA:360deg}}
+#pill span{position:relative;display:inline-block}
+
+/* ---------- AI particle: big sparkle + small sparkle in a 3D-ish orbit ---------- */
+/* partícula do Figma (2860-34673): sparkle de 18 com o de 5 em órbita; a órbita é uma elipse inclinada, com o pequeno passando por trás */
+.ptc{position:relative;width:30px;height:30px;flex:none;color:var(--blue)}
+.ptc .big{position:absolute;left:6px;top:6px;width:18px;height:18px;z-index:1}
+.ptc .small{position:absolute;left:12px;top:12px;width:6px;height:6px;animation:orbit 3.4s linear infinite;will-change:transform}
+.ptc.still .small{animation:none;transform:translate(9px,-9px) scale(1)}
+.ptc .small svg{width:100%;height:100%}
+@keyframes orbit{
+  0.0%{transform:translate(9.2px,-8.8px) scale(1.05);z-index:2;opacity:1.00}
+  4.17%{transform:translate(11.3px,-6.5px) scale(1.04);z-index:2;opacity:0.99}
+  8.33%{transform:translate(12.6px,-3.8px) scale(1.02);z-index:2;opacity:0.97}
+  12.5%{transform:translate(13.0px,-1.0px) scale(0.98);z-index:2;opacity:0.93}
+  16.67%{transform:translate(12.6px,1.8px) scale(0.93);z-index:2;opacity:0.88}
+  20.83%{transform:translate(11.3px,4.5px) scale(0.86);z-index:2;opacity:0.81}
+  25.0%{transform:translate(9.2px,6.8px) scale(0.80);z-index:2;opacity:0.75}
+  29.17%{transform:translate(6.5px,8.5px) scale(0.74);z-index:0;opacity:0.69}
+  33.33%{transform:translate(3.4px,9.6px) scale(0.68);z-index:0;opacity:0.62}
+  37.5%{transform:translate(0.0px,10.0px) scale(0.62);z-index:0;opacity:0.57}
+  41.67%{transform:translate(-3.4px,9.6px) scale(0.58);z-index:0;opacity:0.53}
+  45.83%{transform:translate(-6.5px,8.5px) scale(0.56);z-index:0;opacity:0.51}
+  50.0%{transform:translate(-9.2px,6.8px) scale(0.55);z-index:0;opacity:0.50}
+  54.17%{transform:translate(-11.3px,4.5px) scale(0.56);z-index:0;opacity:0.51}
+  58.33%{transform:translate(-12.6px,1.8px) scale(0.58);z-index:0;opacity:0.53}
+  62.5%{transform:translate(-13.0px,-1.0px) scale(0.62);z-index:0;opacity:0.57}
+  66.67%{transform:translate(-12.6px,-3.8px) scale(0.68);z-index:0;opacity:0.63}
+  70.83%{transform:translate(-11.3px,-6.5px) scale(0.74);z-index:0;opacity:0.69}
+  75.0%{transform:translate(-9.2px,-8.8px) scale(0.80);z-index:0;opacity:0.75}
+  79.17%{transform:translate(-6.5px,-10.5px) scale(0.86);z-index:2;opacity:0.81}
+  83.33%{transform:translate(-3.4px,-11.6px) scale(0.93);z-index:2;opacity:0.88}
+  87.5%{transform:translate(-0.0px,-12.0px) scale(0.98);z-index:2;opacity:0.93}
+  91.67%{transform:translate(3.4px,-11.6px) scale(1.02);z-index:2;opacity:0.97}
+  95.83%{transform:translate(6.5px,-10.5px) scale(1.04);z-index:2;opacity:0.99}
+  100.0%{transform:translate(9.2px,-8.8px) scale(1.05);z-index:2;opacity:1.00}
+}
+
+/* ---------- conversation (light) ---------- */
+#convL{z-index:8}
+#convScroll{position:absolute;left:0;top:0;width:402px;bottom:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;touch-action:pan-y;overscroll-behavior:contain;cursor:grab;padding:162px 20px 208px} /* Figma: coluna começa em 162; o fim da conversa para acima das sugestões (705), medido no render */
+/* header da conversa (Figma 2865-35071): faixa de 156px com blur de fundo 27 (=13.5 CSS) e gradiente branco → 10%, borda dura embaixo; o conteúdo rola por baixo */
+#hdr{position:absolute;left:0;top:0;width:402px;height:156px;z-index:19;pointer-events:none;opacity:0;transition:opacity .4s;background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.1) 96.09%);-webkit-backdrop-filter:blur(13.5px);backdrop-filter:blur(13.5px)}
+#hdr.on{opacity:1}
+#convScroll::-webkit-scrollbar{display:none}
+#convScroll.dragging{cursor:grabbing}
+#convScroll.dragging *{pointer-events:none}
+#conv{display:flex;flex-direction:column;gap:19px;width:362px} /* Figma: coluna 362, gap 19 */
+#conv .tail{flex:none;height:0}
+/* V3: pill de protocolo (Figma 3066-27179) — primeiro item de toda conversa nova, centralizada, rola junto; tocar copia o número.
+   Fica em y 165 e a primeira mensagem em y 197 (o gap da coluna é 19: -7 embaixo dá os 12 do Figma) */
+.proto{align-self:center;margin:3px 0 -7px;display:flex;align-items:center;gap:4px;padding:4.179px 8.357px;border-radius:139.286px;background:rgba(253,254,255,.2);font-size:8.357px;line-height:11.143px;letter-spacing:-.1671px;color:#26384a;white-space:nowrap;transition:transform .2s var(--out),background .2s}
+.proto img{display:block}
+.proto:active{transform:scale(.96);background:rgba(253,254,255,.45)} /* espaço que deixa a pergunta nova ancorar no topo */
+/* balão do usuário + hora (Figma 2927-18549) */
+.um{align-self:flex-end;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.ub{max-width:261px;padding:18px;border-radius:32px 32px 4px 32px;background:linear-gradient(180deg,rgba(255,255,255,.4),#fff);font-size:14px;line-height:20px;letter-spacing:-.28px;color:#212121}
+.um time{font-size:10px;line-height:normal;letter-spacing:-.2px;color:#6b849e}
+/* resposta da IA: texto corrido de 314, negrito nos números-chave */
+.ai{width:314px;color:#212121;font-size:14px;line-height:20px;letter-spacing:-.28px}
+.ai p b{font-weight:600}
+.ai.think{position:relative;display:flex;width:auto;align-items:center;gap:8px;color:var(--muted);font-size:14px;margin-left:-4px} /* o sparkle de 32 tem respiro interno: -4 alinha o desenho à coluna */
+.tspark{width:32px;height:32px;flex:none;overflow:visible}
+.tspark .set{transform-box:view-box;transform-origin:center;animation:spIn .4s cubic-bezier(.05,.7,.1,1) both}
+.ai.think.done .tspark .set{opacity:0;transform:scale(.88);transition:opacity .3s cubic-bezier(.3,0,.8,.15),transform .3s cubic-bezier(.3,0,.8,.15)}
+@keyframes spIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
+.cardL{position:relative;border-radius:32px;background:#fff;border:1.5px solid #cfe0ff;padding:24px 20px;display:flex;flex-direction:column;gap:17px;color:#121212;transition:border-color .6s}
+/* card de comparação (2927-18557) */
+.c-chart .leg2{display:flex;gap:14px}
+.c-chart .leg2 span{display:flex;align-items:center;gap:6px;font-size:12px;line-height:16px;letter-spacing:-.24px;color:#737373}
+.c-chart .leg2 img{width:8px;height:8px;display:block}
+.c-chart .grp{display:flex;flex-direction:column;gap:6px}
+.c-chart .grp .top{display:flex;justify-content:space-between;font-weight:600;font-size:15px;line-height:normal;letter-spacing:-.3px;white-space:nowrap}
+.c-chart .grp i{display:block;height:6px;border-radius:3px;background:#006fff;width:0;transition:width 1.3s var(--out)}
+.c-chart .grp i.prev{background:#cfe0ff}
+/* card de pedidos (2927-27822) */
+.c-orders{gap:24px}
+.c-orders .po{display:flex;align-items:center;gap:12px}
+.c-orders .po .av{width:40px;height:40px;border-radius:200px;background:#f1f1f1;display:flex;align-items:center;justify-content:center;flex:none;font-weight:700;font-size:14px;color:#006fff}
+.c-orders .po .pn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;white-space:nowrap;line-height:normal}
+.c-orders .po .pn b{font-weight:600;font-size:15px;letter-spacing:-.3px}
+.c-orders .po .pn small{font-size:13px;color:#737373}
+.c-orders .po .pv{font-size:15px;letter-spacing:-.3px;line-height:normal;white-space:nowrap}
+.c-orders .dv2{height:1px;background:#d1d1d1}
+.c-orders .tot{display:flex;justify-content:space-between;align-items:center;font-size:15px;letter-spacing:-.3px;line-height:normal;white-space:nowrap}
+.c-orders .tot span{color:#737373}.c-orders .tot b{font-weight:600}
+/* card caixinha (2927-19000) */
+.c-box{gap:24px}
+/* limites até o fim do mês: cada categoria com o teto, uma barrinha do que já foi usado e uma nota */
+.c-lim .lims{display:flex;flex-direction:column;gap:16px}
+.c-lim .lim{display:flex;flex-direction:column;gap:6px}
+.c-lim .lt{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;letter-spacing:-.3px;line-height:normal}
+.c-lim .lt span{color:#737373}.c-lim .lt b{font-weight:600;font-size:16px;color:#121212}
+.c-lim .trk{height:4px;border-radius:2px;background:#e9eef7;overflow:hidden}
+.c-lim .trk i{display:block;height:4px;border-radius:2px;background:#006fff;width:0;transition:width 1.4s var(--out)}
+.c-lim small{font-size:12px;line-height:normal;color:#708aad}
+/* prévia de notificação */
+.c-notif{padding:16px}
+.c-notif .notif{display:flex;gap:12px;align-items:flex-start}
+.c-notif .nic{width:36px;height:36px;border-radius:10px;background:#eef4ff;display:flex;align-items:center;justify-content:center;flex:none}
+.c-notif .nic img{width:20px;height:20px;display:block}
+.c-notif .nt1{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;line-height:normal}
+.c-notif .nt1 b{font-weight:600}.c-notif .nt1 small{font-size:12px;color:#737373}
+.c-notif p{margin-top:2px;font-size:14px;line-height:19px;letter-spacing:-.28px;color:#212121}
+/* V4: componente "Plano criado" — confirmação depois de "Quero investir": check em pílula azul clara que pousa com uma mola curta, título e os detalhes do plano */
+.c-plan .ok{display:flex;align-items:center;gap:12px}
+.c-plan .okic{width:40px;height:40px;border-radius:50%;background:#e5f0ff;color:#006fff;display:flex;align-items:center;justify-content:center;flex:none;animation:okPop .6s cubic-bezier(.34,1.36,.64,1) .35s both}
+.c-plan .okic svg{width:20px;height:20px}
+.c-plan .ok b{display:block;font-weight:600;font-size:18px;line-height:normal;letter-spacing:-.36px}
+.c-plan .ok small{display:block;margin-top:2px;font-size:13px;line-height:normal;color:#737373}
+.c-plan .dv2{height:1px;background:#d1d1d1}
+@keyframes okPop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.c-box .bh{display:flex;align-items:center;justify-content:space-between;height:21px}
+.c-box .bh span{font-size:10px;letter-spacing:-.1922px;color:#737373;line-height:normal;white-space:nowrap}
+.c-box .bh em{font-style:normal;padding:4.179px 8.357px;border-radius:139.286px;background:#006fff;color:#fff;font-size:8.357px;line-height:11.143px;letter-spacing:-.1671px;white-space:nowrap}
+.cardL .big2{font-weight:600;font-size:20px;line-height:normal;letter-spacing:-.56px}
+/* card livre pra gastar (2927-27582) */
+.c-free{gap:16px}
+.c-free .lab3{font-size:10px;letter-spacing:-.26px;color:#737373;line-height:normal;white-space:nowrap}
+.c-free .trk{height:6px;border-radius:3px;background:#e9eef7;overflow:hidden}
+.c-free .trk i{display:block;height:6px;border-radius:3px;background:#006fff;width:0;transition:width 1.4s var(--out)}
+.c-free .nt{font-size:13px;color:#737373;line-height:normal}
+.c-free .dv2{height:1px;background:#d1d1d1}
+.c-free .kvf{display:flex;justify-content:space-between;align-items:center;font-size:14px;letter-spacing:-.3px;line-height:normal;white-space:nowrap}
+.c-free .kvf span{color:#737373}.c-free .kvf b{font-weight:600}.c-free .kvf em{font-style:normal}
+.c-box .kvs{display:flex;flex-direction:column;gap:16px}
+.c-box .kvs div{display:flex;justify-content:space-between;align-items:center;line-height:normal;letter-spacing:-.3px;white-space:nowrap}
+.c-box .kvs span{font-size:14px;color:#737373}.c-box .kvs b{font-weight:600;font-size:16px}
+/* feedback embaixo de cada resposta (2927-27677): 16px, gap 24, a 16 do card */
+.fbk{display:flex;gap:24px;align-items:center;margin-top:-3px}
+.fbk button{width:32px;height:32px;margin:-8px;display:flex;align-items:center;justify-content:center;transition:transform .2s var(--out),opacity .3s}
+.fbk button img{width:16px;height:16px;display:block}
+.fbk button:active{transform:scale(.85)}
+.fbk.voted button[data-k=up]:not(.on),.fbk.voted button[data-k=down]:not(.on){opacity:.3}
+/* sugestões acima do input (2927-27886): pílulas de 49, rolam na horizontal */
+#sugg{position:absolute;left:0;bottom:92px;width:402px;display:flex;gap:8px;padding:0 21px;overflow-x:auto;scrollbar-width:none;z-index:16;touch-action:pan-x;cursor:grab}
+#sugg::-webkit-scrollbar{display:none}
+/* V3: as pills ficam presas 8px acima do campo — sobem com o teclado e com o campo crescendo, na mesma curva e no mesmo tempo dele (.5s iOS) */
+#sugg{transition:bottom .5s var(--ios),opacity .25s ease-out}
+#ask.kb ~ #sugg{bottom:398px}                                              /* teclado: campo a 326 + 64 de altura + 8 */
+#ask.typed ~ #sugg{bottom:calc(28px + var(--ah,115px))}                    /* campo crescido com texto: 20 + altura + 8 */
+#ask.kb.typed ~ #sugg{bottom:calc(334px + var(--ah,115px))}               /* os dois: 326 + altura + 8 */ /* V3: 8px acima do text field (20 de margem + 64 do campo + 8 = 92 do fundo) */
+#sugg.dragging{cursor:grabbing}#sugg.dragging *{pointer-events:none}
+#sugg button{flex:none;height:49px;padding:0 23px;border-radius:188.261px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),inset 0 1px 1px rgba(255,255,255,.6);-webkit-backdrop-filter:blur(24px) saturate(1.2);backdrop-filter:blur(24px) saturate(1.2);font-size:14px;line-height:normal;letter-spacing:-.28px;color:#000;text-align:center;white-space:nowrap;transition:transform .2s var(--out)} /* Figma 2953-27983: branco 50% em vidro (aro branco + desfoque), texto preto 14px — todas iguais */
+#sugg button:active{transform:scale(.96)}
+/* enquanto a IA está construindo este componente, a borda vira um gradient em movimento (indicador da ação atual); depois assenta no azul */
+@property --cardA{syntax:"<angle>";inherits:false;initial-value:0deg}
+.cardL::before{content:"";position:absolute;inset:-1.5px;border-radius:33px;padding:1.5px;pointer-events:none;background:conic-gradient(from var(--cardA),#00189c,#006fff 20%,#9fdcff 38%,rgba(0,111,255,.25) 50%,#00eaff 68%,#006fff 85%,#00189c);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .7s}
+.cardL.live{border-color:rgba(0,111,255,.15)}
+.cardL.live::before{opacity:1;animation:cardSpin 2.4s linear infinite}
+@keyframes cardSpin{to{--cardA:360deg}}
+/* V4 · Tinta de luz (variação 4 de /gas-neon, ref. Gemini): o texto do card chega pintado por um degradê azul que corre da direita pra esquerda
+   e depois assenta na cor real; as barras crescem com um brilho que se apaga. Sem pontos, sem placa */
+.inkt{background:linear-gradient(90deg,#0032c8 0%,#006fff 22%,#5fdcfd 42%,#d6f1ff 50%,#006fff 70%,#0032c8 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:inkflow 1.6s linear both;transition:-webkit-text-fill-color .9s ease-in-out}
+.inkt.settled{-webkit-text-fill-color:var(--c)}
+@keyframes inkflow{from{background-position:100% 0}to{background-position:0% 0}}
+.c-chart .grp i,.c-free .trk i,.cardL .bar i,.cardL .cr .b{transition-property:width,box-shadow;transition-duration:1.3s,.9s}
+.cardL .lit{box-shadow:0 0 12px 1px rgba(0,111,255,.55)}
+.cardL.live > *{animation:rowIn .6s var(--out) both}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* geração na hora (transitions.dev/ui-generation): o card é desenhado em pontos — campo, guias, contorno, partes — e revelado por uma linha de varredura.
+   Quem anima a entrada é o runtime, então o rowIn sai (ele zeraria a opacidade dos filhos e o desenho não acharia as partes) */
+.cardL.live.gen > *{animation:none}
+/* overlay na paleta do protótipo: pontos e guias no azul acinzentado do "pensando", cabeças e mira no azul Neon */
+#convScroll .t-gen{--gen-line:#a9bedc;--gen-strong:#006fff;--gen-ink:rgba(0,81,255,.16);--gen-surface:#fff;--gen-text:#26384a;--gen-muted:#708aad;--gen-dot:2px}
+/* só os pontos: sem alças quadradas, medidas (32 × 32, 290 × 279 t+1.10s), mira e coordenada */
+#convScroll .t-gen .t-gen-handle,#convScroll .t-gen .t-gen-label,#convScroll .t-gen .t-gen-reticle{display:none}
+/* V3 · assinatura Neon (Placa de vidro, variação 3 de /geracao-neon): o desenho acontece sobre uma placa do vidro dos chips da Neon, com um reflexo que atravessa;
+   traços num azul um pouco mais fundo pra ler sobre o vidro, e o miolo da malha de pontos mais ralo */
+#convScroll .t-gen{--gen-line:#9db6de;--gen-ink:rgba(0,81,255,.07)}
+/* V3 · Pontos esparsos (variação C de /geracao-calma): sem partículas voando, a malha não pisca, o pontilhado não corre, varredura discreta */
+#convScroll .t-gen .t-gen-flyer{display:none}
+#convScroll .t-gen .t-gen-dot.is-lit{fill:var(--gen-ink)}
+#convScroll .t-gen .t-gen-wire{stroke-dashoffset:0!important}
+#convScroll .t-gen .t-gen-guide--scan{stroke-opacity:.35}
+#convScroll .t-gen .t-gen-head{fill:#4d8dff}
+#convScroll .ng-glass{position:absolute;inset:0;border-radius:var(--r,32px);background:linear-gradient(180deg,rgba(255,255,255,.62),rgba(255,255,255,.28)),linear-gradient(115deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.55) 45%,rgba(255,255,255,0) 60%);background-size:100% 100%,260% 100%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.85),inset 1px 1px 1px rgba(255,255,255,.7),0 16px 36px -18px rgba(0,40,120,.28);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);opacity:0;pointer-events:none}
+/* streaming: cada palavra surge com um fade curto (ritmo Gemini/Claude) */
+/* V2: cada palavra sobe 8px até o lugar com fade e um desfoque que se dissolve — 700ms numa curva bem macia; como as palavras saem a ~55ms, várias se acomodam ao mesmo tempo */
+.ai p .w{display:inline-block;will-change:transform,opacity;animation:wIn .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes wIn{0%{opacity:0;transform:translateY(8px);filter:blur(3px)}60%{filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
+/* indicador de trabalho com shimmer no texto (GPT) */
+.ai.think .lbl{background-color:rgba(112,138,173,.55);background-image:linear-gradient(90deg,rgba(27,79,214,0),#1b4fd6 50%,rgba(27,79,214,0));background-size:160px 100%;background-repeat:no-repeat;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 4s linear infinite;font-weight:400} /* V3: o brilho tem largura e caminho fixos em px e corre em linear — mesma velocidade (160px/s) em qualquer frase, sem acelerar no meio nem mudar quando o texto troca */
+@keyframes shimmer{from{background-position:-160px 0}to{background-position:480px 0}}
+.cardL h3{font-weight:600;font-size:18px;letter-spacing:-.36px}
+.cardL .lab{font-size:13px;letter-spacing:-.26px;opacity:.6;font-weight:400} /* sem caixa alta: rótulo em Buch 13, cinza */
+.cardL .big{font-weight:600;font-size:32px;line-height:35px;letter-spacing:-.64px;font-variant-numeric:tabular-nums}
+.cardL .kv{display:flex;justify-content:space-between;align-items:center;font-size:14px;letter-spacing:-.28px;font-variant-numeric:tabular-nums}
+.cardL .kv span:first-child{opacity:.6}
+.cardL .kv b{font-weight:600}
+.cardL .dv{height:1px;background:#d1d5db}
+.cardL .step{display:flex;align-items:center;gap:12px;font-size:15px;letter-spacing:-.3px}
+.cardL .step .dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;background:#f1f1f1;color:var(--blue)}
+.cardL .step .dot svg{width:20px;height:20px}
+.cardL .bar{height:6px;border-radius:3px;background:#dbe6ff;overflow:hidden}
+.cardL .bar i{display:block;height:100%;border-radius:3px;background:var(--blue);width:0;transition:width 1.4s var(--out)}
+.cardL .chart{display:flex;flex-direction:column;gap:17px}
+.cardL .leg{display:flex;gap:16px;font-size:12px;opacity:.7}
+.cardL .leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.cardL .cr{display:flex;flex-direction:column;gap:7px}
+.cardL .cr .top{display:flex;justify-content:space-between;font-size:14px;font-weight:600;letter-spacing:-.28px;font-variant-numeric:tabular-nums}
+.cardL .cr .b{height:8px;border-radius:4px;background:var(--blue);width:0;transition:width 1.3s var(--out)}
+.cardL .cr .b.prev{background:#cfe0ff}
+.cardL .pr{display:flex;align-items:center;gap:12px;font-size:14px;letter-spacing:-.28px}
+.cardL .pr .av{width:40px;height:40px;border-radius:50%;background:#eef2f7;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex:none}
+.cardL .pr .av.k{background:var(--ink);color:#fff}
+.cardL .pr .pn{flex:1;min-width:0}
+.cardL .pr .pn b{display:block;font-weight:600}
+.cardL .pr .pn small{display:block;font-size:12px;opacity:.6}
+.cardL .pr .pv{font-weight:600;font-variant-numeric:tabular-nums}
+.cardL .note{font-size:13px;line-height:1.35;opacity:.6;letter-spacing:-.26px}
+.cardL .tag{align-self:flex-start;font-size:12px;padding:7px 12px;border-radius:99px;background:#eef2f7;letter-spacing:-.2px}
+.btnP{height:60px;padding:0 20px;border-radius:32px;background:var(--blue);border:1px solid var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:600;font-size:16px;line-height:normal;letter-spacing:-.32px;transition:transform .2s var(--out)} /* IA/Botão (2896:8856): padding 17/20 → 60 de altura */
+.btnP svg,.btnP img{width:24px;height:24px;display:block}
+.btnP:active{transform:scale(.97)}
+/* CTA primário já usado: fica desabilitado (sem seta, azul apagado) pra não ser tocado de novo. O texto do botão nunca muda depois do clique */
+.btnP{transition:transform .2s var(--out),background-color .35s ease,border-color .35s ease,color .35s ease}
+.btnP:disabled{background:#e9eef7;border-color:#e9eef7;color:#708aad;cursor:default;transform:none}
+.btnP:disabled img{display:none}
+.btnS:disabled{opacity:.35;cursor:default} /* a opção secundária também se apaga depois que a pessoa escolhe uma das duas */
+.btnS{height:40px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;letter-spacing:-.32px;color:var(--ink);transition:opacity .2s}
+.btnS:active{opacity:.5}
+.acts{display:flex;flex-direction:column;gap:10px}
+.chips{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;scrollbar-width:none;width:402px;margin-left:-20px;padding:2px 20px 4px;scroll-snap-type:x proximity;cursor:grab} /* lista horizontal: sugestões não parecem mensagens */
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;scroll-snap-align:start;white-space:nowrap}
+.acts2{display:flex;gap:8px}
+.acts2 button{flex:1;height:54px;border-radius:32px;background:#fff;border:1px solid #d6dde8;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;letter-spacing:-.3px;color:var(--ink);transition:transform .2s var(--out)}
+.acts2 button:active{transform:scale(.97)}
+.acts2 button svg{width:20px;height:20px;color:var(--blue)}
+.chips button{padding:10px 14px;border-radius:99px;background:#fff;border:1px solid #d6dde8;font-size:14px;letter-spacing:-.28px;color:var(--ink);transition:transform .2s var(--out)}
+.chips button:active{transform:scale(.96)}
+.ai .typing::after{content:"";display:inline-block;width:2px;height:16px;background:var(--blue);margin-left:2px;vertical-align:-2px;animation:blink 1s steps(2) infinite}
+
+/* ---------- history (blue, underneath the app) ---------- */
+/* Histórico V2 — Figma 2927-14735 (lista) e 2953-28015 (busca aberta) */
+#histL{z-index:2;color:#fff}
+#histL .blueBg canvas{left:0;top:0;width:402px;height:874px;transform:none} /* V2 Animação: o degradê vivo do header da Home (hist/heroplane.js) no lugar do Light Loop */
+#histL .he{position:absolute;max-width:none;pointer-events:none;display:block} /* elipses do Figma: SVG com blur 100 e 200px de folga */
+#histL .he1{left:-630px;top:620px;width:1364px;height:1278px}
+#histL .he2{left:234px;top:-402px;width:1364px;height:1364px}
+#histL .he3{left:-446px;top:569px;width:1131px;height:998px}
+#status.hist{color:#9bd2ff}
+#status.hist .bat .body,#status.hist .bat .nub{background:rgba(0,120,217,.3);opacity:1}
+#histC{position:absolute;left:20px;top:82px;width:289px;bottom:110px;display:flex;flex-direction:column}
+#histC .hh{position:relative;display:flex;align-items:center;justify-content:space-between;height:48px;margin-bottom:40px;flex:none;z-index:2}
+#histC .hh .t{font-weight:600;font-size:24px;line-height:1;letter-spacing:-.48px}
+#histC .chip.glass,#hSearch,#newChat{background:linear-gradient(0deg,rgba(192,185,185,.21),rgba(233,233,233,.3))} /* no Figma o chip vem dentro de um rotate(180): o gradiente fica invertido */
+#histC .hlist{flex:1;overflow-y:auto;scrollbar-width:none;touch-action:pan-y}
+#histC .hlist.long{padding-bottom:72px;-webkit-mask:linear-gradient(#000 calc(100% - 64px),transparent);mask:linear-gradient(#000 calc(100% - 64px),transparent)} /* o fade só entra quando a lista passa da tela (Mostrar tudo) */
+#histC .hlist::-webkit-scrollbar{display:none}
+#histC .sec{font-weight:600;font-size:16px;line-height:1;letter-spacing:-.32px;margin:0 0 24px}
+#histC .sec.rec{margin-top:40px}
+#histC .sec.rec.first{margin-top:0} /* sem a seção de fixados, "Recentes" abre a lista (Figma 3062-26855) */
+#histC .pins{display:flex;flex-direction:column;gap:15px}
+#histC .recs{display:flex;flex-direction:column;gap:20px;width:279px}
+#histC .pin{display:flex;align-items:center;gap:7px;width:100%;font-size:14px;line-height:1;letter-spacing:-.28px;white-space:nowrap;color:#fff}
+#histC .pin i{width:33.859px;height:33.859px;flex:none;display:flex;align-items:center;justify-content:center}
+#histC .pin i img{width:24px;height:24px;display:block;transform:rotate(41.01deg)}
+#histC .pin span,#histC .rc span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+#histC .rc{display:flex;align-items:center;padding:8px 0;width:100%;font-size:14px;line-height:1;letter-spacing:-.28px;white-space:nowrap;color:#fff}
+#histC .more{align-self:flex-start;padding:8px 0;font-size:16px;line-height:1;letter-spacing:-.32px;background:linear-gradient(180deg,#eeeaea,#b7d6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#histC .pin:active,#histC .rc:active,#histC .more:active{opacity:.6}
+/* busca: o chip da lupa se abre num campo de 293 (Figma 2953-28048) */
+#hSearch{position:absolute;left:0;top:0;width:293px;height:48px;border-radius:200px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 1px 1px 1px rgba(255,255,255,.28);-webkit-backdrop-filter:blur(24px) saturate(1.2);backdrop-filter:blur(24px) saturate(1.2);display:none}
+#hSearch.on{display:block}
+#hsIco{position:absolute;left:17px;top:12px;width:24px;height:24px}
+#hsIco img{width:24px;height:24px;display:block}
+#hsIn{position:absolute;left:51px;top:0;width:226px;height:48px;border:0;outline:none;background:none;color:#fff;font:inherit;font-size:14px;letter-spacing:-.28px;caret-color:#fff;user-select:text;-webkit-user-select:text}
+#hsIn::placeholder{color:rgba(255,255,255,.55)}
+#hsIn{width:196px} /* V3: abre espaço pro fechar à direita */
+/* V3: fechar a busca — chip de vidro de 24 no canto direito do campo (a 12 da borda); volta o histórico ao estado inicial */
+#hsClose{position:absolute;right:12px;top:12px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);color:#fff;transition:transform .2s var(--out),background .2s}
+#hsClose svg{width:14px;height:14px}
+#hsClose:active{transform:scale(.9);background:rgba(255,255,255,.26)}
+#hRes{position:absolute;left:0;right:0;top:86px;bottom:0;overflow-y:auto;scrollbar-width:none}
+#hRes::-webkit-scrollbar{display:none}
+#hRes .res{display:flex;flex-direction:column;gap:16px}
+#hRes .empty{font-size:14px;line-height:1;letter-spacing:-.28px;padding:8px 0;opacity:.6}
+#newChat{position:absolute;left:20px;top:775px;width:164px;height:56px;border-radius:200px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),inset 1px 1px 1px rgba(255,255,255,.28);-webkit-backdrop-filter:blur(24px) saturate(1.2);backdrop-filter:blur(24px) saturate(1.2);color:#fff;font-weight:600;font-size:16px;letter-spacing:-.32px;transition:transform .2s var(--out)}
+#newChat:active{transform:scale(.96)}
+#newChat img{position:absolute;left:36.5px;top:19px;width:18px;height:18px;display:block}
+#newChat span{position:absolute;left:97px;top:19px;transform:translateX(-50%);line-height:normal;white-space:nowrap}
+
+/* ---------- toast + cursor ---------- */
+#toast{position:absolute;left:50%;bottom:190px;transform:translate(-50%,10px);padding:12px 20px;border-radius:200px;background:rgba(0,6,24,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;font-size:12px;letter-spacing:-.24px;opacity:0;transition:opacity .3s,transform .4s var(--out);z-index:40;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+body.fineptr, body.fineptr *{cursor:none!important}
+#touchCursor{position:fixed;left:0;top:0;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.32);border:1.5px solid rgba(255,255,255,.75);box-shadow:0 1px 10px rgba(0,20,60,.28), inset 0 0 6px rgba(255,255,255,.25);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .12s,height .12s,background-color .12s,opacity .25s;opacity:0;will-change:left,top}
+#touchCursor.down{width:22px;height:22px;background:rgba(255,255,255,.55)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 20 20" fill="none"><path d="M4 7v6M8 3.5v13M12 6.5v7M16 8.5v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-up" viewBox="0 0 20 20" fill="none"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 20 20" fill="currentColor"><rect x="5.5" y="5.5" width="9" height="9" rx="2"/></symbol>
+    <symbol id="i-arr" viewBox="0 0 24 24" fill="none"><path d="M12.4 17 17.4 12l-5-5M17.4 12H6.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sub" viewBox="0 0 20 20" fill="none"><path d="M5 3v8a3 3 0 0 0 3 3h8M12 10l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 4.8 3.2 7.4 10 10-6.8 2.6-9.4 5.2-10 10-.6-4.8-3.2-7.4-10-10 6.8-2.6 9.4-5.2 10-10z"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24" fill="none"><path d="M7 3h7l5 5v13H7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 3v5h5M10 13h5M10 17h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 14.5c.5 1 1.6 1.5 3 1.5 1.7 0 3-.8 3-2.1 0-2.7-5.7-1.3-5.7-3.9 0-1.2 1.2-2 2.7-2 1.3 0 2.3.5 2.8 1.4M12 6.5V8M12 16v1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none"><path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 16z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none"><path d="M14.5 3.5l6 6-2 2-1-.5-4 4 .5 3.5-2 2-4-4-5 5-1-1 5-5-4-4 2-2 3.5.5 4-4-.5-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+    <symbol id="i-shift" viewBox="0 0 24 24" fill="none"><path d="M12 4l8 8h-5v7H9v-7H4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-del" viewBox="0 0 24 24" fill="none"><path d="M9 5h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 9.5l5 5M17 9.5l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 12h17M12 3.5c3 3 3 14 0 17M12 3.5c-3 3-3 14 0 17" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="p-big" viewBox="0 0 18 18"><g transform="rotate(-90 9 9)"><path d="M18.0078 9.00414C18.0078 9.60802 17.5498 10.1138 16.9488 10.1732C13.3744 10.5268 10.5278 13.3724 10.172 16.9501C10.1078 17.5955 9.53288 18.0664 8.88745 18.0022C8.24202 17.938 7.77115 17.363 7.83533 16.7176C8.16676 13.3847 10.1449 10.5393 12.9445 9.00414C11.2843 8.09373 9.91385 6.72266 9.00367 5.06177C8.09383 6.72195 6.72445 8.09297 5.06512 9.00338C6.2068 9.62968 7.21124 10.474 8.02266 11.4792C8.43001 11.9839 8.35142 12.7234 7.8468 13.1308C7.34209 13.5382 6.60264 13.4589 6.19523 12.9542C4.95396 11.4165 3.12739 10.3779 1.05852 10.1732C0.457576 10.1138 -0.00047535 9.60802 -0.000475323 9.00414C-0.000475297 8.40027 0.457578 7.89446 1.05852 7.83504C4.63294 7.48153 7.4796 4.63585 7.83533 1.05823C7.89508 0.457613 8.40009 4.2871e-05 9.00367 -3.93583e-07C9.6073 -1.02056e-06 10.113 0.457565 10.1728 1.05823C10.5285 4.63587 13.3744 7.48153 16.9488 7.83504C17.5498 7.89446 18.0078 8.40027 18.0078 9.00414Z" fill="currentColor"/></g></symbol>
+    <symbol id="p-small" viewBox="0 0 6 6"><g transform="rotate(-90 3 3)"><path d="M2.96702 5.53372C3.10178 4.17853 4.17916 3.101 5.53369 2.96706C4.17915 2.83312 3.10181 1.75558 2.96705 0.400391C2.8323 1.75559 1.7549 2.83312 0.400358 2.96706C1.18497 3.04464 1.87659 3.43883 2.34588 4.0202" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol><symbol id="i-pix" viewBox="0 0 24 24"><path d="M12 3.5l8.5 8.5-8.5 8.5L3.5 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.5 12l3.5-3.5 3.5 3.5-3.5 3.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol><symbol id="i-sparkpair" viewBox="0 0 24 24"><use href="#p-big" x="3" y="3" width="18" height="18"/><path d="M21 8.56C21.13 7.21 22.21 6.13 23.56 6C22.21 5.86 21.13 4.78 21 3.43C20.86 4.78 19.79 5.86 18.43 6C19.22 6.07 19.91 6.47 20.38 7.05" fill="none" stroke="currentColor" stroke-width=".8" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.2-1.8c.2-.3.5-.4.8-.4h4c.3 0 .6.1.8.4L16 6h1.5A2.5 2.5 0 0 1 20 8.5V17a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol><symbol id="i-paste" viewBox="0 0 24 24"><rect x="6" y="5" width="12" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 5a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9.5 12h5M9.5 15.5h3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol><symbol id="i-star3d" viewBox="0 0 128 128"><defs><linearGradient id="sg1" x1="20" y1="20" x2="108" y2="108" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e9f6ff"/><stop offset=".45" stop-color="#6fb4ff"/><stop offset="1" stop-color="#0b4fd6"/></linearGradient></defs><path d="M64 10c4 26 20 42 48 54-28 12-44 28-48 54-4-26-20-42-48-54 28-12 44-28 48-54z" fill="none" stroke="url(#sg1)" stroke-width="13" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+  <div id="flows">
+    <button data-flow="2"><b>1</b>Pela navbar</button>
+    <button data-flow="4"><b>2</b>Pela FAQ</button>
+    <button id="restart">Recomeçar</button>
+  </div>
+  <div id="device"><div id="screen">
+    <div id="island" aria-hidden="true"></div>
+    <div id="status">
+      <div class="time">13:35</div>
+      <svg class="loc" viewBox="0 0 22 20" aria-hidden="true"><path d="M20.0185 2.269C20.4695 1.45428 19.6917 0.507574 18.805 0.791929L4.89111 5.2537C3.82108 5.59683 3.99831 7.16209 5.11798 7.25729L10.657 7.72825C11.2248 7.77653 11.6451 8.27744 11.5939 8.84503L11.1013 14.3121C11.0015 15.4196 12.4864 15.8752 13.0249 14.9024L20.0185 2.269Z" fill="currentColor"/></svg>
+      <div class="cell"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i></div>
+      <svg class="wifi" viewBox="0 0 21 17" aria-hidden="true"><path d="M1.84082 4.56611C4.29073 2.58238 7.34748 1.5 10.4998 1.5C13.6522 1.5 16.7089 2.58238 19.1588 4.56611" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M5.45215 8.79657C6.89383 7.67036 8.67072 7.05859 10.5001 7.05859C12.3296 7.05859 14.1065 7.67036 15.5481 8.79657" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M11.3918 14.4716C10.9151 15.001 10.0849 15.001 9.60819 14.4716L8.15789 12.8608C7.71445 12.3683 7.75048 11.5927 8.33901 11.288C9.0018 10.9448 9.74214 10.7617 10.5 10.7617C11.2578 10.7617 11.9982 10.9448 12.661 11.288C13.2495 11.5927 13.2855 12.3683 12.8421 12.8608L11.3918 14.4716Z" fill="currentColor"/></svg>
+      <div class="bat"><i class="body"></i><i class="lvl"></i><i class="nub"></i></div>
+    </div>
+
+    <!-- HISTORY: blue, underneath the app -->
+    <div id="histL" class="layer hidden">
+      <div class="blueBg"><canvas id="histPlane"></canvas><div class="tint"></div><img class="he he1" src="hist/ellipse-bottom.svg" alt=""><img class="he he2" src="hist/ellipse-right.svg" alt=""></div>
+      <div id="histC">
+        <div class="hh"><div class="t">Histórico</div><button class="chip glass" id="histSearch" aria-label="Buscar"><img src="hist/search.svg" width="24" height="24" alt=""></button>
+          <div id="hSearch"><button id="hsIco" aria-label="Fechar busca"><img src="hist/search.svg" width="24" height="24" alt=""></button><input id="hsIn" type="text" placeholder="Buscar conversas" spellcheck="false" autocomplete="off" aria-label="Buscar no histórico"><button id="hsClose" aria-label="Fechar busca"><svg><use href="#i-close"/></svg></button></div></div>
+        <div class="hlist" id="histList"></div>
+        <div id="hRes" class="hidden"><div class="sec">Resultados</div><div class="res"></div></div>
+      </div>
+      <img class="he he3" src="hist/ellipse-low.svg" alt=""><!-- no Figma a elipse 14551 vem por cima da lista -->
+      <button id="newChat"><img src="hist/edit.svg" width="18" height="18" alt=""><span>Novo chat</span></button>
+    </div>
+
+    <!-- APP: intro (blue) → home / thinking / conversation (light) -->
+    <div id="app">
+      <div id="lightL" class="layer"><img class="le hm le2" src="home/bg-ellipse-bottom.svg" alt=""><img class="le hm le1" src="home/bg-ellipse-top.svg" alt=""><img class="le cv cv3" src="conv/ellipse-br.svg" alt=""><img class="le cv cv2" src="conv/ellipse-bottom.svg" alt=""><img class="le cv cv1" src="conv/ellipse-top.svg" alt=""></div>
+      <div id="introL" class="layer">
+        <div class="blueBg" id="introBg"><canvas id="gl"></canvas><div class="tint"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b1"></div></div>
+        <div id="ringGlow"></div><div id="ring"></div>
+        <div id="introC">
+          <div class="ico" id="introIco">
+            <div class="glow"></div>
+            <img src="icon3d.png" alt="" draggable="false" onerror="this.remove();document.querySelectorAll('.ico .fb,#homeIco .fb').forEach(e=>e.style.display='block')">
+            <svg class="fb" style="display:none"><use href="#i-star3d"/></svg>
+            <i class="spark"></i><i class="spark"></i><i class="spark"></i><i class="spark"></i><i class="spark"></i><i class="spark"></i>
+          </div>
+          <div id="greet"></div>
+        </div>
+      </div>
+
+
+      <div id="hdr"></div>
+      <div class="nav" id="nav" style="opacity:0">
+        <button class="chip" id="menuBtn" aria-label="Histórico"><img src="home/menu.svg" width="24" height="24" alt=""></button>
+        <div class="ttl"><div class="tin"><img id="navSpark" src="home/spark.svg" width="23" height="23" alt=""><span>IA Neon</span></div></div>
+        <button class="chip" id="minBtn" aria-label="Minimizar"><span class="min"><img class="a" src="conv/minimize-arrow.svg" width="14.5228" height="14.5228" alt=""><img class="b" src="conv/minimize-arrow.svg" width="14.5228" height="14.5228" alt=""></span></button>
+        <button class="chip" id="closeBtn" aria-label="Fechar"><img src="home/close.svg" width="18" height="18" alt=""></button>
+      </div>
+
+      <div id="homeIco"><img src="icon3d.png" alt="" draggable="false" onerror="this.remove()"><svg class="fb" style="display:none"><use href="#i-star3d"/></svg></div>
+      <div id="homeL" class="layer hidden">
+        <div id="homeTitle"></div>
+        <div id="carousel"><!-- V4: cards da home do Figma 3066-27466 — cada um promete uma conversa, e o fluxo do chat entrega isso (fluxos 5, 6 e 7) -->
+          <button class="card blue" data-q="Quero entender o que mais pesou no meu delivery" data-flow="5">
+            <span class="cimg" style="left:16px;top:19px;width:49.93px;height:44.001px;transform:scaleX(-1)"><img src="home/card-cartao.png" alt="" draggable="false" style="left:-13.12%;top:-22.7%;width:126.87%;height:143.97%"></span>
+            <span class="cgo" style="left:128.22px;top:15px"><img src="home/arrow-right-card1.svg" width="16" height="16" alt=""></span>
+            <span class="ct" style="left:21px;top:115px;width:120px">Delivery foi seu maior gasto neste mês. Quer entender o que mais pesou?</span></button>
+          <button class="card refract" data-q="Vamos planejar o restante do meu orçamento do mês" data-flow="6">
+            <span class="cimg" style="left:11px;top:20px;width:56.827px;height:63.456px"><img src="home/card-fatura.png" alt="" draggable="false" style="left:-23.89%;top:-15.17%;width:146.11%;height:130.85%"></span>
+            <span class="cgo" style="left:123.49px;top:18.44px;background:linear-gradient(179.43deg,rgba(192,185,185,.21) 22.934%,rgba(233,233,233,.3) 99.511%)"><img src="home/arrow-right-card2.svg" width="16" height="16" alt=""></span>
+            <span class="ct" style="left:20px;top:116px;width:139px">Você já usou 70% do seu orçamento do mês. Vamos planejar o restante?</span></button>
+          <button class="card" data-q="Vamos planejar meu fim de semana com os R$ 150 de lazer" data-flow="7">
+            <span class="cimg" style="left:11px;top:20px;width:47.048px;height:57px"><span class="cimg" style="left:-62.84px;top:-18.01px;width:285.792px;height:191.734px"><img src="home/card-extrato.png" alt="" draggable="false" style="left:-20.85%;top:-49.95%;width:100.12%;height:100%"></span></span>
+            <span class="cgo" style="left:123.49px;top:18.44px;background:linear-gradient(179.43deg,rgba(192,185,185,.21) 22.934%,rgba(233,233,233,.3) 99.511%)"><img src="home/arrow-right-card2.svg" width="16" height="16" alt=""></span>
+            <span class="ct" style="left:20px;top:116px;width:139px">Você ainda tem R$ 150 no orçamento de lazer. Vamos planejar o fim de semana?</span></button>
+        </div>
+        <div id="prompts">
+          <button data-q="Enviar um Pix"><img src="home/arrow-sub.svg" width="20" height="20" alt="">Enviar um Pix</button>
+          <button data-q="Criar um lembrete"><img src="home/arrow-sub.svg" width="20" height="20" alt="">Criar um lembrete</button>
+          <button data-q="Fazer uma recarga"><img src="home/arrow-sub.svg" width="20" height="20" alt="">Fazer uma recarga</button>
+          <button data-q="Fazer um investimento"><img src="home/arrow-sub.svg" width="20" height="20" alt="">Fazer um investimento</button>
+        </div>
+      </div>
+
+      <!-- placeholder entry screens (flows 2 & 3) -->
+      <div id="phL" class="layer hidden">
+        <div class="top"><span id="phTitle">Extrato</span><span>Placeholder</span></div>
+        <div class="sk"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i><i class="r5"></i></div>
+        <div class="note" id="phNote">Esta tela de entrada ainda vai ser desenhada no Figma. O botão abaixo leva pra experiência da IA Neon.</div>
+        <button class="cta" id="phCta"><svg><use href="#i-spark"/></svg><span id="phCtaT">Analisar meus gastos com a IA</span></button>
+      </div>
+
+      <!-- entry point do fluxo 2: home do app Neon (Figma 2865-34701) -->
+      <div id="entry2" class="layer hidden">
+        <div class="e-cards">
+          <div class="e-card"><div class="e-art e-cardimg"><span class="e-time">13:35</span><span class="e-neon">neon</span><i class="e-chip"></i></div><div class="e-lbl">Fatura aberta</div><div class="e-val">R$ 0,00</div><button class="e-btn">Adiantar</button></div>
+          <div class="e-card"><div class="e-art e-cofre"><i class="e-cube"></i></div><div class="e-lbl">Novo cofrinho</div><div class="e-val">R$ 0,00</div><button class="e-btn">Guardar</button></div>
+        </div>
+        <div class="e-tx">
+          <h3>Transações</h3>
+          <div class="e-row"><i class="e-ic"><svg viewBox="0 0 24 24"><path d="M12 4l8 8-8 8-8-8z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 12l3.5-3.5 3.5 3.5-3.5 3.5z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></i><div class="e-txt"><b>Josué Rocha Flores</b><small>Pix recebido</small></div><div class="e-amt"><b><span class="e-in">↙</span> R$ 80,00</b><small>14:22</small></div></div>
+          <div class="e-row"><i class="e-ic"><svg viewBox="0 0 24 24"><path d="M3 12c0-1.5 2-3 5-3.2M3 12c0 1.5 2 3 5 3.2M21 12c0-1.5-2-3-5-3.2M21 12c0 1.5-2 3-5 3.2M12 6v12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></i><div class="e-txt"><b>Carrefour</b><small>Pix recebido</small></div><div class="e-amt"><b><span class="e-out">↗</span> R$ 40,00</b><small>14:22</small></div></div>
+          <div class="e-row"><i class="e-ic"><svg viewBox="0 0 24 24"><path d="M12 4l8 8-8 8-8-8z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 12l3.5-3.5 3.5 3.5-3.5 3.5z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></i><div class="e-txt"><b>Maria dos Santos</b><small>Pix recebido</small></div><div class="e-amt"><b><span class="e-in">↙</span> R$ 80,00</b><small>14:22</small></div></div>
+          <button class="e-btn e-all">Todas</button>
+        </div>
+        <button class="e-banner" id="e2Banner"><i class="e-spark"><svg viewBox="0 0 24 24"><use href="#i-sparkpair"/></svg></i><div><b id="e2T">Analise meus gastos com IA</b><small id="e2S">Seus pedidos de delivery subiram 40% em outubro</small></div><span class="e-x">×</span></button>
+        <div class="e-promo"><div class="e-photo"></div><span class="e-x e-px">×</span></div>
+        <div class="e-tab"><div class="e-tabs"><i class="on"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></i><i><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/></svg></i><i><svg viewBox="0 0 24 24"><path d="M12 4l8 8-8 8-8-8z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></i></div><button class="e-ai" id="e2Ai"><svg viewBox="0 0 24 24"><use href="#i-sparkpair"/></svg></button></div>
+      </div>
+
+      <!-- entry point pela FAQ: tela Ajuda do app (Figma 2734-29631) -->
+      <div id="faqL" class="layer hidden">
+        <div id="faqScroll" class="scroll"><div id="faqC">
+          <div class="f-hd"><button class="f-back" id="faqBack" aria-label="Voltar"><img src="faq/arrow-back.svg" width="24" height="24" alt=""></button><h1>Ajuda</h1></div>
+          <div class="f-ban">
+            <div class="ft"><b>Fale conosco pelo chat</b><small>Com a IA Neon pronta para ajudar</small></div>
+            <img class="fimg" src="faq/star3d.png" width="53" height="53" alt="" draggable="false">
+            <div id="faqAsk"><input id="faqIn" type="text" placeholder="Pergunte qualquer coisa" spellcheck="false" autocomplete="off" enterkeyhint="send" aria-label="Pergunte qualquer coisa para a IA Neon"><button id="faqSend" aria-label="Enviar para a IA Neon"><img src="faq/arrow-send.svg" width="24" height="24" alt=""></button></div>
+          </div>
+          <div class="f-list">
+            <button class="f-search" data-t="Buscar na Ajuda"><img src="faq/search.svg" width="24" height="24" alt=""><span>Buscar</span></button>
+            <button class="f-row r1"><span class="fic"><img src="faq/qr.svg" width="24" height="24" alt=""></span><span class="fl">Informações importantes</span><img src="faq/chevron.svg" width="20" height="20" alt=""></button>
+            <button class="f-row"><span class="fic"><img src="faq/qr.svg" width="24" height="24" alt=""></span><span class="fl">Minha Conta</span><img src="faq/chevron.svg" width="20" height="20" alt=""></button>
+            <button class="f-row"><span class="fic"><img src="faq/qr.svg" width="24" height="24" alt=""></span><span class="fl">Cartões</span><img src="faq/chevron.svg" width="20" height="20" alt=""></button>
+            <button class="f-row"><span class="fic"><img src="faq/qr.svg" width="24" height="24" alt=""></span><span class="fl">Viracrédito</span><img src="faq/chevron.svg" width="20" height="20" alt=""></button>
+            <button class="f-row"><span class="fic"><img src="faq/qr.svg" width="24" height="24" alt=""></span><span class="fl">Caminho para o Crédito</span><img src="faq/chevron.svg" width="20" height="20" alt=""></button>
+            <button class="f-row rl"><span class="fic"><img src="faq/qr.svg" width="24" height="24" alt=""></span><span class="fl">Empréstimo</span><img src="faq/chevron.svg" width="20" height="20" alt=""></button>
+          </div>
+          <button class="f-libras">Solicitar atendimento em Libras</button>
+        </div></div>
+      </div>
+
+      <div id="convL" class="layer hidden">
+        <div id="convScroll" class="scroll"><div id="conv"></div></div>
+      </div>
+
+      <div id="scrim"></div>
+      <div id="ask" class="hidden">
+        <span class="ph">Pergunte ou peça algo</span><i class="cur"></i>
+        <textarea id="ta" rows="1" aria-label="Pergunte ou peça algo" spellcheck="false" autocomplete="off"></textarea>
+        <div class="tghost" id="tghost" aria-hidden="true"></div>
+        <button class="plus" id="plusBtn" aria-label="Anexar"><img src="home/input-plus.svg" width="24" height="24" alt=""></button>
+        <button class="vb" id="vb" aria-label="Enviar"><span class="voice"><img src="home/input-voice.svg" width="20.5714" height="20.5714" alt=""></span><img class="send" src="home/input-send.svg" width="14" height="14" alt=""><svg class="stop"><use href="#i-stop"/></svg><svg class="check"><use href="#i-check"/></svg></button>
+        <button class="rcancel" id="rcancel" aria-label="Cancelar gravação"><svg><use href="#i-close"/></svg></button>
+        <canvas class="rviz" id="rviz" aria-hidden="true"></canvas>
+      </div>
+
+      <div id="sugg" class="hidden"></div><!-- V3: fora do #convL — dentro dele (z 8) o degradê claro do input (#scrim, z 14) cobria as pills e as deixava lavadas -->
+      <div id="toast"></div>
+    </div>
+    <!-- V2: o teclado mora na tela (fora do #app) pra servir também à busca do histórico, que fica ao lado do app deslizado -->
+    <div id="kb" aria-hidden="true">
+      <div class="krow" data-row="qwertyuiop"></div>
+      <div class="krow" data-row="asdfghjkl"></div>
+      <div class="krow"><button class="key fn" data-k="shift"><svg><use href="#i-shift"/></svg></button><span class="krow" data-row="zxcvbnm" style="margin:0"></span><button class="key fn" data-k="del"><svg><use href="#i-del"/></svg></button></div>
+      <div class="krow"><button class="key fn n123" data-k="123">123</button><button class="key space" data-k=" ">espaço</button><button class="key ret" data-k="ret">retorno</button></div>
+      <div class="kbar"><svg><use href="#i-globe"/></svg><svg><use href="#i-mic"/></svg></div>
+      <div class="hi"></div>
+    </div>
+  </div></div>
+  <div id="hint">Toque nos cards, prompts ou digite no campo · os chips no canto trocam o cenário</div>
+</div>
+<div id="touchCursor"></div>
+
+<script src="lightloop.js"></script>
+<script src="conv/thinkspark.js"></script>
+<script src="hist/heroplane.js"></script>
+<script>
+/* ============================================================
+   IA Neon — protótipo. Motion: easings canônicas do Pix, FLIP de continuidade,
+   build-in de cima pra baixo com stagger lento, saída pelo caminho inverso.
+   ============================================================ */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const supportsLinear=CSS.supports('animation-timing-function','linear(0, 1)');
+function springEase(stiffness=180,damping=20,mass=1,n=60){ if(!supportsLinear) return 'cubic-bezier(.16,1,.3,1)'; const w0=Math.sqrt(stiffness/mass),z=damping/(2*Math.sqrt(stiffness*mass)),wd=w0*Math.sqrt(1-z*z),T=6/(z*w0),pts=[]; for(let i=0;i<=n;i++){const t=T*i/n; pts.push((1-Math.exp(-z*w0*t)*(Math.cos(wd*t)+(z*w0/wd)*Math.sin(wd*t))).toFixed(4));} pts[n]='1'; return `linear(${pts.join(',')})`; }
+const SPRING=springEase(150,20), SPRING_SOFT=springEase(110,19);
+const IOS='cubic-bezier(.32,.72,0,1)', OUT='cubic-bezier(.16,1,.3,1)', INOUT='cubic-bezier(.65,0,.35,1)';
+function anim(el,kf,o){ const a=el.animate(kf,Object.assign({fill:'both'},o)); a.finished.then(()=>{try{a.commitStyles()}catch(e){} try{a.cancel()}catch(e){}}).catch(()=>{}); return a.finished.catch(()=>{}); }
+function stagger(list,{dist=18,delay=80,dur=760,start=0,from='y'}={}){ return Promise.all(list.map((k,i)=>anim(k,[{opacity:0,transform:from==='y'?`translateY(${dist}px)`:`translateX(${dist}px)`},{opacity:1,transform:'none'}],{duration:dur,delay:start+i*delay,easing:OUT}))); }
+function outDown(list,{dist=22,delay=45,dur=380,start=0}={}){ const rev=[...list].reverse(); return Promise.all(rev.map((k,i)=>anim(k,[{opacity:1,transform:'none'},{opacity:0,transform:`translateY(${dist}px)`}],{duration:dur,delay:start+i*delay,easing:'ease-in'}))); }
+function clearAnim(el){ el.style.opacity=''; el.style.transform=''; el.style.filter=''; }
+/* V3: saída da saudação — as palavras se dissolvem na ordem de leitura: sobem 8px, ganham um desfoque de 3px e somem em 420ms (in-out), 40ms entre elas.
+   Antes era 240ms em ease-in, de trás pra frente, e parecia apagar de repente enquanto o azul clareava por baixo */
+function greetOut(){ return Promise.all($$('#greet span').map((k,i)=>anim(k,[{opacity:1,transform:'none',filter:'blur(0px)'},{opacity:0,transform:'translateY(-8px)',filter:'blur(3px)'}],{duration:420,delay:i*40,easing:'cubic-bezier(.45,0,.55,1)'}))); }
+const kScreen=()=>402/$('#screen').getBoundingClientRect().width;
+function rectIn(el){ const r=el.getBoundingClientRect(),s=$('#screen').getBoundingClientRect(),k=kScreen(); return {x:(r.left-s.left)*k,y:(r.top-s.top)*k,w:r.width*k,h:r.height*k}; }
+const showToast=t=>{ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(showToast._t); showToast._t=setTimeout(()=>el.classList.remove('on'),1900); };
+function words(el,text){ el.innerHTML=''; const ws=text.split(' '); ws.forEach((w,i)=>{ const s=document.createElement('span'); s.textContent=w; el.appendChild(s); if(i<ws.length-1) el.appendChild(document.createTextNode(' ')); }); return $$('span',el); }
+/* V2: troca de texto do "pensando" pelo brilho — uma faixa de luz varre o texto da esquerda pra direita; atrás dela já está o texto novo,
+   à frente ainda o antigo. Sem movimento vertical: três camadas no mesmo lugar (antigo · novo · brilho) com máscaras que andam juntas */
+function swapText(el,text,{dur=1500}={}){ if(el.textContent===text) return Promise.resolve();
+  if(reduced){ el.textContent=text; return Promise.resolve(); }
+  const w0=el.offsetWidth; const old=el.cloneNode(true); el.textContent=text; const W=Math.max(w0,el.offsetWidth)+12;
+  const glow=el.cloneNode(true);
+  const pin=n=>{ Object.assign(n.style,{position:'absolute',left:el.offsetLeft+'px',top:el.offsetTop+'px',pointerEvents:'none'}); el.parentNode.appendChild(n); };
+  const mask=(n,g)=>{ Object.assign(n.style,{width:W+'px',whiteSpace:'nowrap',webkitMaskImage:g,maskImage:g,webkitMaskSize:'250% 100%',maskSize:'250% 100%',webkitMaskRepeat:'no-repeat',maskRepeat:'no-repeat',webkitMaskPosition:'100% 0',maskPosition:'100% 0'}); };
+  pin(old); pin(glow); Object.assign(old.style,{animation:'none',backgroundImage:'none'}); // a cópia não reinicia o brilho: fica só na cor base
+  Object.assign(glow.style,{background:'none',color:'#1b4fd6',webkitTextFillColor:'#1b4fd6',animation:'none',textShadow:'0 0 8px rgba(0,111,255,.35)'});
+  mask(old,'linear-gradient(90deg,transparent 0%,transparent 46%,#000 50%,#000 100%)');   // à frente da luz: ainda o texto antigo
+  mask(el,'linear-gradient(90deg,#000 0%,#000 40%,transparent 44%,transparent 100%)');    // atrás da luz: o texto novo
+  mask(glow,'linear-gradient(90deg,transparent 37%,#000 45%,transparent 53%)');           // a luz cobre o vão entre os dois: o antigo some e o novo nasce dentro dela
+  // a máscara anda quadro a quadro (mask-position via WAAPI não interpola em todo navegador); ease in-out cúbico
+  const t0=performance.now(), ease=p=>-(Math.cos(Math.PI*p)-1)/2; // V3: seno in-out, sem a arrancada do cúbico
+  return new Promise(res=>{ const step=now=>{ const p=Math.min(1,(now-t0)/dur), pos=(100-100*ease(p)).toFixed(2)+'% 0';
+      [old,el,glow].forEach(n=>{ n.style.webkitMaskPosition=pos; n.style.maskPosition=pos; });
+      if(p<1) return requestAnimationFrame(step);
+      old.remove(); glow.remove(); ['width','whiteSpace','webkitMaskImage','maskImage','webkitMaskSize','maskSize','webkitMaskRepeat','maskRepeat','webkitMaskPosition','maskPosition'].forEach(k=>el.style[k]=''); res(); };
+    requestAnimationFrame(step); }); }
+const PTC=(still)=>`<span class="ptc${still?' still':''}"><svg class="big"><use href="#p-big"/></svg><span class="small"><svg><use href="#p-small"/></svg></span></span>`;
+
+/* ---------- relógio real ---------- */
+(function clock(){ const d=new Date(); $('#status .time').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); setTimeout(clock,15000); })();
+
+/* ---------- stage + cursor (idêntico ao protótipo do Pix) ---------- */
+const isTouch=matchMedia('(pointer:coarse)').matches;
+function fitStage(){ const vw=innerWidth,vh=innerHeight,mobile=isTouch&&vw<700; document.body.classList.toggle('mobile',mobile); $('#device').style.transform=mobile?`scale(${Math.min(vw/402,vh/874)})`:`scale(${Math.min(1,(vh-130)/(874+24),(vw-40)/(402+24))})`; }
+addEventListener('resize',fitStage); fitStage();
+if(matchMedia('(pointer:fine)').matches){ document.body.classList.add('fineptr'); const tc=$('#touchCursor'); addEventListener('pointermove',e=>{tc.style.left=e.clientX+'px';tc.style.top=e.clientY+'px';tc.style.opacity='1';},{passive:true}); addEventListener('pointerdown',()=>tc.classList.add('down'),true); addEventListener('pointerup',()=>tc.classList.remove('down'),true); addEventListener('pointercancel',()=>tc.classList.remove('down'),true); document.documentElement.addEventListener('mouseleave',()=>{tc.style.opacity='0';}); }
+(function(){ let el=null,axis='y',p0=0,s0=0,moved=false,vel=0,last=0,lastT=0,raf=0,suppress=false;
+  addEventListener('pointerdown',e=>{ if(e.pointerType==='touch') return; const c=e.target.closest('#carousel,#sugg'); const sc=c||e.target.closest('.scroll,.hlist'); if(!sc) return; el=sc; axis=c?'x':'y'; p0=axis==='x'?e.clientX:e.clientY; s0=axis==='x'?sc.scrollLeft:sc.scrollTop; moved=false; vel=0; last=p0; lastT=performance.now(); cancelAnimationFrame(raf); });
+  addEventListener('pointermove',e=>{ if(!el) return; const p=axis==='x'?e.clientX:e.clientY; const d=(p-p0)*kScreen(); if(!moved&&Math.abs(d)>6){moved=true; el.classList.add('dragging');} if(moved){ if(axis==='x') el.scrollLeft=s0-d; else el.scrollTop=s0-d; const t=performance.now(); vel=(p-last)*kScreen()/Math.max(1,t-lastT); last=p; lastT=t; } });
+  addEventListener('click',e=>{ if(suppress){suppress=false; e.stopPropagation(); e.preventDefault();} },true);
+  const end=()=>{ if(!el) return; const sc=el,ax=axis; el=null; if(moved){ suppress=true; setTimeout(()=>{suppress=false;},80); let v=-vel*16; const step=()=>{ v*=.94; if(Math.abs(v)<.3){ sc.classList.remove('dragging'); return; } if(ax==='x') sc.scrollLeft+=v; else sc.scrollTop+=v; raf=requestAnimationFrame(step); }; raf=requestAnimationFrame(step); setTimeout(()=>sc.classList.remove('dragging'),0); } };
+  addEventListener('pointerup',end); addEventListener('pointercancel',end);
+})();
+
+/* ---------- fundo azul: Neon Light Loop (preset do artefato), com o crop/rotação do Figma aplicado via CSS ---------- */
+const PRESET={"dirAngle":177,"reach":1.15,"spread":1.25,"density":1,"detail":2.1,"scale":0.55,"curve":0.95,"turb":0.3,"soft":0.28,"core":0.55,"bias":0.66,"focusX":0.5,"focusY":1.18,"speed":0.285,"tile":8,"loopSec":180,"flow":1,"sway":0.18,"breathe":0.12,"envAmt":1,"rise":0.26,"fall":0.22,"shades":3000,"brightness":1.5,"intensity":1.3,"contrast":2.1,"gamma":1,"blackPt":0.14,"blur":20,"blurMix":0.5,"glow":0.7,"grain":0.02,"vignette":0.15,"seed":7,"stops":["#000006","#0032c8","#0088fc","#5fdcfd","#c8f6ff"],"dither":true,"reverse":false,"continuous":true,"maxH":900};
+const GL={};
+function glOn(id){ if(GL[id]||typeof NeonLightLoop==='undefined') return GL[id]; const c=$('#'+id); try{ GL[id]=NeonLightLoop.mount(c,Object.assign({},PRESET,{maxH:id==='gl3'?520:900})); }catch(e){ console.warn('WebGL',e); } if(!GL[id]) c.style.background='linear-gradient(170deg,#0a2a9a 0%,#1b56ff 40%,#0a3ddb 70%,#021a6e 100%)'; return GL[id]; }
+function glOff(id){ if(GL[id]){ try{GL[id].destroy();}catch(e){} GL[id]=null; } }
+/* fundo do histórico: o degradê vivo do header da Home; se o script não carregar, o azul sólido de antes */
+let histBg=null;
+function histBgOn(){ if(histBg) return; const c=$('#histPlane'); if(window.HeroPlane) histBg=HeroPlane.mount(c); else c.style.background='linear-gradient(170deg,#0a2a9a 0%,#1b56ff 40%,#0a3ddb 70%,#021a6e 100%)'; }
+function histBgOff(){ if(histBg){ histBg.destroy(); histBg=null; } }
+
+/* ---------- estado ---------- */
+const S={flow:0,screen:'intro',busy:false,kb:false,shift:false,pending:null};
+const nav=$('#nav'), status=$('#status'), ask=$('#ask'), ta=$('#ta'), app=$('#app');
+function setDark(on){ status.classList.toggle('dark',on); }
+
+/* ---------- INTRO (≈3.4 s) ---------- */
+async function intro(){
+  S.screen='intro'; setDark(false); closeHist(true); $('#scrim').classList.remove('on');
+  ['#homeL','#convL','#phL'].forEach(s=>$(s).classList.add('hidden')); $('#hdr').classList.remove('on'); ask.classList.add('hidden'); ask.classList.remove('open','typed','kb','busy'); ta.value='';
+  setTimeout(()=>{ if(S.screen!=='intro') return; $('#entry2').classList.add('hidden'); $('#faqL').classList.add('hidden'); },400); // a home Neon (ou a Ajuda) some em fade (260ms) por cima da intro que já começou
+  const introL=$('#introL'); introL.classList.remove('hidden'); introL.style.opacity='1'; $('#introBg').style.opacity='1'; nav.style.opacity='0'; $('#navSpark').style.opacity='0'; clearAnim($('#homeIco')); setConvChrome(false); hideSugg(true);
+  const ico=$('#introIco'), img=$('img,.fb',ico), glow=$('.glow',ico);
+  ico.classList.remove('pulse'); ico.style.opacity='1';
+  const gw=words($('#greet'),'Olá Sara, bom dia.'); gw.forEach(s=>{s.style.opacity='0';});
+  if(img){ img.style.opacity='0'; img.style.clipPath=''; img.style.transform=''; img.style.filter=''; } glow.style.opacity='0';
+  const ring=$('#ring'), rg=$('#ringGlow'); [ring,rg].forEach(r=>{ r.classList.remove('on','off'); void r.offsetWidth; });
+  glOn('gl');
+  // 0 — a luz acende; a linha gradient desenha a borda e brilha
+  anim($('#introBg'),[{opacity:0},{opacity:1}],{duration:1100,easing:OUT});
+  setTimeout(()=>{ ring.classList.add('on'); rg.classList.add('on'); },250);
+  // 300 — ícone 3D em cascata: brilho → corpo com wipe de baixo pra cima → faíscas; depois pulsa
+  await wait(300);
+  anim(glow,[{opacity:0,transform:'translate(-50%,-50%) scale(.35)'},{opacity:.85,transform:'translate(-50%,-50%) scale(1)'}],{duration:1300,easing:OUT});
+  if(img){ anim(img,[{opacity:0,clipPath:'inset(100% 0 0 0)',transform:'translateY(28px) scale(.8) rotate(-14deg)',filter:'blur(10px)'},{opacity:1,clipPath:'inset(-10% 0 0 0)',transform:'none',filter:'blur(0)'}],{duration:1200,delay:80,easing:SPRING}); }
+  setTimeout(()=>{ if(S.screen==='intro'){ if(img){img.style.transform='';} ico.classList.add('pulse'); } },1500);
+  // 1100 — saudação, palavra por palavra
+  await wait(800);
+  stagger(gw,{dist:14,delay:110,dur:700});
+  await wait(2300);
+  if(S.screen!=='intro') return;
+  if(S.pending){ const p=S.pending; S.pending=null; await introToThinking(p.text,p.flow); } else await introToHome();
+}
+
+/* ---------- INTRO → HOME: azul vira claro; o ícone viaja do centro pro canto; a saudação vira a pergunta ---------- */
+async function introToHome(){
+  S.screen='home';
+  const home=$('#homeL'); home.classList.remove('hidden'); applyFlowHome();
+  const ring=$('#ring'), rg=$('#ringGlow'); ring.classList.add('off'); rg.classList.add('off');
+  // FLIP do ícone: do centro até o sparkle da nav
+  $('#introIco').classList.remove('pulse'); const iimg=$('img,.fb',$('#introIco')); if(iimg) iimg.style.transform='';
+  flyIconToNav(1000);
+  // a luz azul se dissolve na tela clara; a saudação sai pra cima
+  anim($('#introBg'),[{opacity:1},{opacity:0}],{duration:800,easing:INOUT});
+  setTimeout(()=>setDark(true),350);
+  greetOut();
+  homeCascade(280);
+  setTimeout(()=>{ if(S.screen!=='intro') $('#introL').classList.add('hidden'); },850);
+}
+/* V3: a home monta numa cascata só, de cima pra baixo — nav → título → cards → prompts → input — com passo curto (40–60ms),
+   tudo pousando em ~1,1s. Antes o título vinha sozinho e o corpo esperava ~1s */
+function homeCascade(t=0,{withNav=true}={}){
+  const hTitle=$('#homeTitle'), cards=$$('.card'), ps=$$('#prompts button');
+  const tw=words(hTitle,'Por onde começamos?'); [...tw,...cards,...ps].forEach(e=>e.style.opacity='0'); hTitle.style.opacity='1';
+  nav.style.opacity='1'; if(withNav) stagger([$('#menuBtn'),$('.tin',nav),$('#closeBtn')],{dist:8,delay:40,dur:500,start:t});
+  stagger(tw,{dist:12,delay:60,dur:520,start:t+80});
+  stagger(cards,{dist:16,delay:60,dur:600,start:t+200});
+  stagger(ps,{dist:10,delay:40,dur:480,start:t+340});
+  ask.classList.remove('hidden','open','typed','kb','busy'); $('.ph',ask).textContent='Pergunte ou peça algo'; ta.value='';
+  anim(ask,[{opacity:0,transform:'translateY(16px)'},{opacity:1,transform:'none'}],{duration:640,delay:t+460,easing:SPRING_SOFT});
+}
+/* V2: o ícone 3D (128) viaja do centro e encolhe até o tamanho do sparkle da nav (23); no fim se dissolve e o sparkle assume */
+function flyIconToNav(dur=1000){
+  const hIco=$('#homeIco'), ns=$('#navSpark'), ii=$('#introIco');
+  const from=rectIn(ii), to=rectIn(ns), k=to.w/128;
+  hIco.style.left=to.x+'px'; hIco.style.top=to.y+'px'; hIco.style.opacity='1'; ns.style.opacity='0';
+  ii.style.opacity='0'; $$('.spark',ii).forEach(s=>s.style.opacity='0');
+  anim(hIco,[{transform:`translate(${from.x-to.x}px,${from.y-to.y}px) scale(${from.w/128})`},{transform:`translate(0,0) scale(${k})`}],{duration:dur,easing:IOS});
+  setTimeout(()=>{ anim(hIco,[{opacity:1},{opacity:0}],{duration:320,easing:OUT}); anim(ns,[{opacity:0,transform:'rotate(90deg) scale(.6)'},{opacity:1,transform:'rotate(90deg) scale(1)'}],{duration:520,easing:SPRING}); },dur*.72);
+  return wait(dur);
+}
+function applyFlowHome(){ $$('#flows button[data-flow]').forEach(b=>b.classList.toggle('on',+b.dataset.flow===S.flow));
+  // no cenário de cashback, o card de cashback vem em primeiro no carrossel
+  const car=$('#carousel'), cb=$('.card[data-flow="1"]',car); if(cb){ if(S.flow===1) car.prepend(cb); else car.append(cb); } car.scrollLeft=0; }
+
+/* ---------- INPUT ---------- */
+function openAsk(){ if(S.busy||REC.on||REC.out) return; ask.classList.add('open','focus'); if(!S.kb) showKb(true); ta.focus({preventScroll:true}); }
+function closeAsk(){ if(typeof finishType==='function') finishType(); ask.classList.remove('open','focus'); showKb(false); if(!ta.value.trim()) ask.classList.remove('typed'); fitAsk(); ta.blur(); }
+/* com texto o campo vira caixa: cresce com as linhas (20 cada) até 4 — 23 em cima + texto + 72 da linha de botões = 175 no máximo (3015-11117) */
+function fitAsk(){ if(!ta.value.trim()) return; const t=ta.style.height; ta.style.height='20px'; const th=Math.min(80,Math.max(20,ta.scrollHeight)); ta.style.height=t; ask.style.setProperty('--th',th+'px'); ask.style.setProperty('--ah',(23+th+72)+'px'); $('#sugg').style.setProperty('--ah',(23+th+72)+'px'); } // as pills acompanham a altura do campo
+function showKb(on){ S.kb=on; $('#kb').classList.toggle('on',on); ask.classList.toggle('kb',on); }
+ask.addEventListener('click',e=>{ if(e.target.closest('#vb,#plusBtn,#rcancel')) return; openAsk(); });
+ta.addEventListener('input',()=>{ ask.classList.toggle('typed',ta.value.trim().length>0); fitAsk(); });
+ta.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); submit(); } if(e.key==='Escape'){ closeAsk(); } });
+$('#vb').addEventListener('click',()=>{ if(REC.on){ recFinish('send'); return; } if(REC.out) return; if(S.busy){ showToast('A IA Neon ainda está respondendo'); return; } if(ta.value.trim()) submit(); else recStart(); });
+$('#rcancel').addEventListener('click',()=>recFinish('cancel'));
+
+/* ---------- gravação de voz: A1 · Batimento ----------
+   A voz é simulada (o artefato não tem microfone): palavras de 140–380ms, intervalos curtos, respiros a cada 3–7 palavras.
+   20 amostras/s; cada barra fica 5px à esquerda da anterior → 120px/s */
+const REC={on:false,out:null,outT:0,t0:0,last:0,hist:[],raf:0,prev:0,n:0}, rcv=$('#rviz'), rctx=rcv.getContext('2d');
+const VOX={lvl:0,mode:'pause',until:0,peak:0,start:0,words:0,phase:0};
+const TRANSCRIPTS=['Quanto posso gastar até o fim do mês?','Pode fazer uma análise dos meus gastos de setembro?'];
+function voxStep(now,dt){ const v=VOX;
+  if(now>=v.until){ if(v.mode==='word'){ v.words--; if(v.words<=0){ v.mode='pause'; v.until=now+450+Math.random()*650; } else { v.mode='gap'; v.until=now+70+Math.random()*120; } }
+    else { if(v.mode==='pause') v.words=3+Math.floor(Math.random()*5); v.mode='word'; v.start=now; v.until=now+140+Math.random()*240; v.peak=.35+Math.random()*.65; v.phase=Math.random()*6; } }
+  let target=.03; if(v.mode==='word'){ const p=Math.min(1,(now-v.start)/(v.until-v.start)); target=v.peak*Math.pow(Math.sin(Math.PI*p),.6)*(.78+.22*Math.sin(p*Math.PI*3+v.phase)); }
+  target*=1+(Math.random()-.5)*.12; v.lvl+=(target-v.lvl)*(1-Math.pow(1-(target>v.lvl?.45:.16),dt/16.7)); }
+function recStart(){ if(S.busy||REC.on||REC.out) return; closeAsk();
+  const dpr=Math.min(devicePixelRatio||1,2); rcv.width=Math.round(rcv.offsetWidth*dpr); rcv.height=Math.round(rcv.offsetHeight*dpr);
+  Object.assign(REC,{on:true,out:null,hist:[],t0:performance.now(),dpr}); REC.last=REC.t0; REC.prev=REC.t0;
+  ask.classList.add('rec'); $('#vb').setAttribute('aria-label','Enviar áudio'); cancelAnimationFrame(REC.raf); REC.raf=requestAnimationFrame(recLoop); }
+function recFinish(how){ if(!REC.on) return; REC.on=false; REC.out=how; REC.outT=performance.now(); ask.classList.remove('rec'); ask.classList.add('rout');
+  const dur=reduced?0:how==='send'?350:150; // cancelar sai mais rápido que enviar
+  if(how==='cancel'&&!reduced){ rcv.style.transition='filter .15s ease-out'; rcv.style.filter='blur(2px)'; }
+  if(how==='send') anim($('#vb'),[{transform:'scale(1)'},{transform:'scale(.9)'},{transform:'scale(1)'}],{duration:350,easing:'cubic-bezier(.22,1,.36,1)'});
+  // V3: o check transcreve — o texto do que foi dito entra no campo (letras subindo, como nos prompts) e a pessoa revisa antes de enviar. O ✕ descarta o áudio
+  setTimeout(()=>{ recReset(); if(how==='send') transcribeIn(TRANSCRIPTS[REC.n++%TRANSCRIPTS.length]); else showToast('Áudio descartado'); },dur); }
+function transcribeIn(text){ finishType(); ta.value=text; ask.classList.add('typed'); fitAsk(); ta.setSelectionRange(text.length,text.length);
+  if(reduced) return;
+  const g=$('#tghost'); ask.classList.add('typing'); g.style.setProperty('--type-delay','0ms');
+  Array.from(text).forEach((ch,i)=>{ const sp=document.createElement('span'); sp.textContent=ch; sp.style.setProperty('--i',i); g.appendChild(sp); });
+  typeTimer=setTimeout(finishType,250+24*(text.length-1)+40); }
+function recReset(){ cancelAnimationFrame(REC.raf); REC.on=false; REC.out=null; ask.classList.remove('rec','rout'); ask.style.setProperty('--lvl',0);
+  rctx.setTransform(1,0,0,1,0,0); rctx.clearRect(0,0,rcv.width,rcv.height); rcv.style.transition=''; rcv.style.filter=''; $('#vb').setAttribute('aria-label','Enviar'); }
+function recLoop(now){ REC.raf=requestAnimationFrame(recLoop); const dt=Math.min(64,now-REC.prev); REC.prev=now; voxStep(now,dt);
+  const lvl=VOX.lvl, W=rcv.offsetWidth, H=rcv.offsetHeight, mid=H/2, head=W-3, sp=5;
+  if(REC.on){ while(now-REC.last>=50){ REC.hist.push(Math.max(0,Math.min(1,lvl+(Math.random()-.5)*.04))); REC.last+=50; if(REC.hist.length>80) REC.hist.shift(); } ask.style.setProperty('--lvl',lvl.toFixed(3)); }
+  const out=REC.out?Math.min(1,(now-REC.outT)/(REC.out==='send'?350:150)):0, send=REC.out==='send', ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  const frac=REC.on?Math.min(1,(now-REC.last)/50):0, back=t=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+  rctx.setTransform(REC.dpr,0,0,REC.dpr,0,0); rctx.clearRect(0,0,W,H); rctx.lineCap='round'; rctx.lineWidth=2.5;
+  const n=REC.hist.length, mixc=t=>`rgb(${Math.round(165*t)},${Math.round(111+(182-111)*t)},${Math.round(255+(208-255)*t)})`; // azul Neon → cinza azulado
+  for(let k=0;k<n;k++){ let x=head-(k+frac)*sp; if(x<-4) break; if(send) x=head-(head-x)*(1-ease(out));
+    const age=(k+frac)*50, g=reduced?1:back(Math.min(1,age/180)), bh=Math.max(0,(2.5+REC.hist[n-1-k]*(H-8))*g-2.5);
+    rctx.strokeStyle=mixc(Math.max(0,Math.min(1,(k-4)/36))); rctx.globalAlpha=Math.max(0,Math.min(1,x/40))*(send?1-out*out:1)*(REC.out==='cancel'?1-out:1);
+    rctx.beginPath(); rctx.moveTo(x,mid-bh/2); rctx.lineTo(x,mid+bh/2); rctx.stroke(); }
+  rctx.globalAlpha=1; }
+$('#plusBtn').addEventListener('click',()=>showToast('Anexar foto ou arquivo em breve'));
+document.addEventListener('pointerdown',e=>{ if(!ask.classList.contains('open')) return; if(e.target.closest('#ask,#kb')) return; closeAsk(); },true);
+(function buildKb(){ $$('#kb [data-row]').forEach(r=>{ r.dataset.row.split('').forEach(ch=>{ const b=document.createElement('button'); b.className='key'; b.dataset.k=ch; b.textContent=ch; r.appendChild(b); }); });
+  $('#kb').addEventListener('pointerdown',e=>{ e.preventDefault(); const k=e.target.closest('.key'); if(!k) return; const v=k.dataset.k; const T=searchOn?$('#hsIn'):faqOn?$('#faqIn'):ta; /* digita no campo ativo: busca do histórico, banner da Ajuda ou input da IA */ const letters=$$('#kb .key:not(.fn):not(.space):not(.ret)'); if(v==='shift'){ S.shift=!S.shift; letters.forEach(b=>b.textContent=S.shift?b.dataset.k.toUpperCase():b.dataset.k); return; } if(v==='del'){ T.value=T.value.slice(0,-1); } else if(v==='ret'){ if(searchOn) kbSearch(false); else if(faqOn) faqSend(); else submit(); return; } else if(v==='123'){ showToast('Só letras neste protótipo'); return; } else { T.value+=(S.shift||T.value.length===0)?v.toUpperCase():v; if(S.shift){S.shift=false; letters.forEach(b=>b.textContent=b.dataset.k);} } T.dispatchEvent(new Event('input')); });
+})();
+function route(text){ const t=text.toLowerCase(); if(/fim de semana/.test(t)) return 7; if(/or[çc]amento/.test(t)&&/planej|restante|sobra/.test(t)) return 6; if(/delivery/.test(t)&&/pes|entender|mais/.test(t)) return 5; if(/plano|economiz/.test(t)) return 21; if(/cashback|cash back/.test(t)) return 1; if(/posso gastar|quanto posso|sobra|livre pra|quanto tenho/.test(t)) return 3; if(/gast|an[aá]lise|analis|extrato|onde foi|delivery|ifood/.test(t)) return 2; if(/quanto/.test(t)) return 3; return 0; }
+function submit(){ const text=ta.value.trim(); if(!text||S.busy) return; startConversation(text,route(text)); }
+$('#carousel').addEventListener('click',e=>{ const c=e.target.closest('.card'); if(!c) return; startConversation(c.dataset.q,+(c.dataset.flow||0),{fromEl:c}); });
+/* prompts da home: o input sobe com o teclado e o texto é escrito letra por letra pra pessoa completar (interação do protótipo da home do Assistente) */
+let typeTimer=0;
+function finishType(){ clearTimeout(typeTimer); $('#tghost').textContent=''; ask.classList.remove('typing'); }
+function typeIn(text){ finishType();
+  // coreografia: primeiro o teclado sobe; a escrita entra quando ele está pousando (75% dos 500ms dele). Com o teclado já aberto, escreve na hora
+  const lead=ask.classList.contains('open')?0:375; openAsk();
+  ta.value=text; ask.classList.add('typed'); fitAsk(); ta.setSelectionRange(text.length,text.length); // o texto real já está no campo, com o cursor no fim
+  if(reduced) return;
+  const g=$('#tghost'); ask.classList.add('typing'); g.style.setProperty('--type-delay',lead+'ms');
+  Array.from(text).forEach((ch,i)=>{ const sp=document.createElement('span'); sp.textContent=ch; sp.style.setProperty('--i',i); g.appendChild(sp); });
+  typeTimer=setTimeout(finishType,lead+250+24*(text.length-1)+40); }
+$('#prompts').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; typeIn(b.textContent.trim()+' '); }); // espaço no fim: a pessoa só continua digitando
+
+/* ---------- placeholders (entry points dos fluxos 2 e 3) ---------- */
+const PH={2:{title:'Extrato',cta:'Analisar meus gastos com a IA',q:'Pode fazer uma análise dos meus gastos de setembro?'},3:{title:'Cartão e contas',cta:'Quanto posso gastar?',q:'Quanto posso gastar?'}};
+function showPlaceholder(flow){ const p=PH[flow]; S.screen='ph'; setDark(true); closeHist(true); $('#scrim').classList.remove('on');
+  ['#homeL','#convL','#introL','#phL','#entry2','#faqL'].forEach(s=>$(s).classList.add('hidden')); $('#hdr').classList.remove('on'); ask.classList.add('hidden'); nav.style.opacity='0';
+  if(flow===2||flow===3){ // home do app Neon: o banner é o entry point (2865-34701 / 2876-35200)
+    const E={2:{t:'Analise meus gastos com IA',s:'Seus pedidos de delivery subiram 40% em outubro'},3:{t:'Quanto posso gastar?',s:'Faltam 12 dias pro salário. Veja o que sobra.'}}[flow];
+    $('#e2T').textContent=E.t; $('#e2S').textContent=E.s;
+    const e=$('#entry2'); e.classList.remove('hidden');
+    stagger([$('.e-cards'),$('.e-tx'),$('.e-banner'),$('.e-promo'),$('.e-tab')],{dist:16,delay:70,dur:520});
+    const leave=()=>anim(e,[{opacity:1},{opacity:0}],{duration:260,easing:IOS}).then(()=>{ e.classList.add('hidden'); e.style.opacity=''; });
+    $('#e2Banner').onclick=()=>{ S.pending={text:p.q,flow}; leave(); intro(); };
+    $('#e2Ai').onclick=()=>{ S.pending=null; leave(); intro(); };
+    return;
+  }
+  $('#phTitle').textContent=p.title; $('#phCtaT').textContent=p.cta; const ph=$('#phL'); ph.classList.remove('hidden');
+  stagger([$('#phL .top'),...$$('#phL .sk i'),$('#phL .note'),$('#phL .cta')],{dist:14,delay:60,dur:500});
+  $('#phCta').onclick=()=>{ S.pending={text:p.q,flow}; $('#phL').classList.add('hidden'); intro(); };
+}
+/* ---------- entry point pela FAQ: tela Ajuda (Figma 2734-29631) ----------
+   O campo do banner "Fale conosco pelo chat" manda a pergunta direto pra IA Neon: sem a splash da IA e sem passar pela home dela, a mensagem já cai na conversa.
+   O teclado do protótipo digita no campo (faqOn); retorno ou o botão azul enviam */
+let faqOn=false;
+function faqKb(on){ faqOn=on; kbSearch(on); }
+function showFaq(){ S.screen='faq'; setDark(true); closeHist(true); $('#scrim').classList.remove('on');
+  ['#homeL','#convL','#introL','#phL','#entry2'].forEach(s=>$(s).classList.add('hidden')); $('#hdr').classList.remove('on'); ask.classList.add('hidden'); nav.style.opacity='0'; hideSugg(true);
+  const f=$('#faqL'); clearAnim(f); f.classList.remove('hidden'); $('#faqIn').value=''; $('#faqScroll').scrollTop=0;
+  stagger([$('.f-hd'),$('.f-ban'),$('.f-list'),$('.f-libras')],{dist:16,delay:70,dur:520}); }
+function faqFocus(){ $('#faqScroll').scrollTo({top:0,behavior:reduced?'auto':'smooth'}); if(!faqOn) faqKb(true); $('#faqIn').focus({preventScroll:true}); }
+function faqSend(){ const inp=$('#faqIn'), text=inp.value.trim(); if(!text){ faqFocus(); return; } if(faqOn) faqKb(false); inp.blur(); faqToChat(text,route(text)); }
+/* Ajuda → conversa, sem a splash: a nav já nasce no formato da conversa (título à esquerda + minimizar), a Ajuda some em fade
+   e a pergunta cai no chat — o mesmo pouso da entrada por banner (introToThinking), só que sem a intro azul antes */
+async function faqToChat(text,flow){ const f=$('#faqL'), ttl=$('.ttl',nav), mb=$('#minBtn');
+  $('#introL').classList.add('hidden'); $('#homeL').classList.add('hidden'); setDark(true); clearAnim($('#homeIco')); $('#navSpark').style.opacity='1';
+  ttl.style.transition=mb.style.transition='none'; setConvChrome(true); void ttl.offsetWidth; ttl.style.transition=mb.style.transition='';
+  await anim(f,[{opacity:1},{opacity:0}],{duration:260,easing:IOS}); f.classList.add('hidden'); clearAnim(f);
+  nav.style.opacity='1'; stagger([$('#menuBtn'),$('.tin',nav),mb,$('#closeBtn')],{dist:8,delay:40,dur:500}).then(()=>clearAnim(mb));
+  S.screen='home'; /* a conversa parte do estado "home" */ await startConversation(text,flow,{fromIntro:true}); }
+$('#faqAsk').addEventListener('click',e=>{ if(e.target.closest('#faqSend')) return; faqFocus(); });
+$('#faqSend').addEventListener('click',faqSend);
+$('#faqIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); faqSend(); } if(e.key==='Escape'&&faqOn) faqKb(false); });
+document.addEventListener('pointerdown',e=>{ if(faqOn&&!e.target.closest('#kb,#faqAsk')) faqKb(false); },true);
+$('#faqBack').addEventListener('click',()=>showToast('Voltar pro app · em breve'));
+$$('#faqL .f-search,#faqL .f-row,#faqL .f-libras').forEach(b=>b.addEventListener('click',()=>showToast((b.dataset.t||b.textContent.trim())+' · em breve')));
+
+/* a intro desemboca direto no pensamento quando a pessoa veio de um entry point externo */
+/* V3: entrada por banner (ex.: "Quanto posso gastar?") — mesma coreografia da ida pra home: a saudação se dissolve, o azul clareia e o sparkle
+   voa do centro até o título da nav. A nav já nasce no formato da conversa (título à esquerda + minimizar), então o sparkle pousa direto no lugar final;
+   aí a pergunta cai no chat. Antes o ícone sumia no centro e o título só depois deslizava, e parecia quebrado */
+async function introToThinking(text,flow){
+  const ring=$('#ring'), rg=$('#ringGlow'); ring.classList.add('off'); rg.classList.add('off');
+  $('#introIco').classList.remove('pulse'); const iimg=$('img,.fb',$('#introIco')); if(iimg) iimg.style.transform='';
+  const ttl=$('.ttl',nav), mb=$('#minBtn'); ttl.style.transition=mb.style.transition='none'; setConvChrome(true); void ttl.offsetWidth; ttl.style.transition=mb.style.transition='';
+  flyIconToNav(1000);
+  anim($('#introBg'),[{opacity:1},{opacity:0}],{duration:800,easing:INOUT}); setTimeout(()=>setDark(true),350);
+  greetOut();
+  nav.style.opacity='1'; stagger([$('#menuBtn'),$('.tin',nav),mb,$('#closeBtn')],{dist:8,delay:40,dur:500,start:280}).then(()=>clearAnim(mb));
+  await wait(1000); $('#introL').classList.add('hidden');
+  S.screen='home'; // a conversa parte do estado "home"
+  await startConversation(text,flow,{fromIntro:true});
+}
+
+/* ---------- HOME → PENSAMENTO (≈5 s) → CONVERSA ---------- */
+async function startConversation(text,flow,{fromIntro=false,fromEl=null}={}){
+  if(S.busy) return; S.busy=true; closeAsk(); ta.value=''; ask.classList.remove('typed'); ask.classList.add('busy'); hideSugg(); // a pergunta já foi pro chat: o campo volta a pílula
+  const fromHome=S.screen==='home';
+  if(fromHome){
+    S.screen='think';
+    const hIco=$('#homeIco');
+    const kids=[$('#homeTitle'),...$$('.card'),...$$('#prompts button')];
+    // V3: a nav vira a da conversa já no primeiro quadro — o título desliza pra esquerda enquanto a home sai, não depois
+    setConvChrome(true); $('#hdr').classList.add('on');
+    // V3: a home sai em cascata subindo (título → cards → atalhos): cada item sobe 18px, some e desfoca 3px em 300ms, 30ms depois do anterior.
+    // O card tocado sai junto com os outros — não vira mais o balão (o morph ficou em makeGhost/morphInto, desligado)
+    if(!fromIntro){ if(reduced) kids.forEach(k=>k.style.opacity='0'); else kids.forEach((k,i)=>anim(k,[{opacity:1,transform:'none',filter:'blur(0px)'},{opacity:0,transform:'translateY(-18px)',filter:'blur(3px)'}],{duration:300,delay:i*30,easing:'cubic-bezier(.32,0,.67,0)'})); await wait(reduced?0:30*(kids.length-1)+300); }
+    // vindo da intro, o sparkle já pousou na nav (introToThinking): nada a desmontar aqui
+    $('#homeL').classList.add('hidden'); clearAnim(hIco); hIco.style.opacity=''; hIco.style.transform=''; kids.forEach(clearAnim);
+    // V2: sem o círculo de pensamento — a mensagem cai direto no chat e o "pensando" acontece dentro da conversa
+    $('#conv').innerHTML=''; anchor=null; protoTag(); $('#convScroll').scrollTop=0;
+    $('#convL').classList.remove('hidden'); S.screen='conv'; $('#scrim').classList.add('on');
+    ask.classList.remove('hidden'); $('.ph',ask).textContent='Pergunte ou peça algo';
+    if(fromIntro) anim(ask,[{opacity:0,transform:'translateY(40px)'},{opacity:1,transform:'none'}],{duration:900,delay:200,easing:SPRING_SOFT});
+  } else { ta.value=''; ask.classList.remove('typed'); }
+  await runFlow(text,flow); setLive(null);
+  S.busy=false; ask.classList.remove('busy');
+}
+
+/* ---------- blocos da conversa ---------- */
+const conv=$('#conv');
+function node(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+/* V2: a pergunta de um turno novo ancora no topo da conversa (Figma "Analise de gastos 3"); o .tail no fim dá o espaço pra isso */
+const tail=document.createElement('div'); tail.className='tail'; let anchor=null;
+function addConv(el){ if(tail.parentNode!==conv) conv.appendChild(tail); conv.insertBefore(el,tail); }
+async function push(el,{dist=18,dur=800}={}){ addConv(el); await anim(el,[{opacity:0,transform:`translateY(${dist}px)`},{opacity:1,transform:'none'}],{duration:dur,easing:OUT}); scrollEnd(); return el; }
+function scrollEnd(){ const sc=$('#convScroll'); let top=sc.scrollHeight;
+  if(anchor&&anchor.isConnected&&tail.isConnected){ const vis=sc.clientHeight-155-208; tail.style.height=Math.max(0,vis-(tail.offsetTop-anchor.offsetTop))+'px'; top=Math.max(anchor.offsetTop-155,sc.scrollHeight-sc.clientHeight); } // a pergunta ancorada fica em y 155 (Figma 2927-18973)
+  else tail.style.height='0px';
+  sc.scrollTo({top,behavior:reduced?'auto':'smooth'}); }
+const hhmm=()=>{ const d=new Date(); return String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0'); };
+/* protocolo do atendimento: nasce com a conversa e fica no topo dela */
+function protoTag(){ const n='2026'+Array.from({length:15},()=>Math.floor(Math.random()*10)).join('');
+  const el=node(`<button class="proto" type="button" aria-label="Copiar protocolo ${n}"><span>Protocolo: ${n}</span><img src="conv/copy-protocol.svg" width="10.3569" height="10.3569" alt=""></button>`);
+  el.addEventListener('click',()=>{ try{ navigator.clipboard.writeText(n).catch(()=>{}); }catch(e){} showToast('Protocolo copiado'); });
+  addConv(el); anim(el,[{opacity:0,transform:'translateY(-4px)'},{opacity:1,transform:'none'}],{duration:400,delay:150,easing:OUT}); }
+async function userMsg(t,{anchorTop=false}={}){ const el=node(`<div class="um"><div class="ub">${t}</div><time>${hhmm()}</time></div>`); anchor=anchorTop?el:null;
+  if(S.morph){ const m=S.morph; S.morph=null; addConv(el); el.style.opacity='0'; scrollEnd(); await morphInto(m,el,t); return el; }
+  // V3: o balão do usuário sobe 24px de baixo pro lugar exato dele, saindo de um desfoque leve (650ms, curva suave)
+  addConv(el); scrollEnd(); await anim(el,[{opacity:0,transform:'translateY(24px)',filter:'blur(4px)'},{opacity:1,transform:'none',filter:'blur(0px)'}],{duration:reduced?1:650,easing:'cubic-bezier(.22,1,.36,1)'}); return el; }
+/* V3: card → balão. O fantasma copia o card no lugar dele; a caixa voa até o balão real (560ms, iOS) trocando o raio 34 → 32/32/4/32;
+   a face do card some nos primeiros 200ms, o vidro branco entra no meio e o texto da pergunta pousa no fim. Aí o balão real assume */
+function makeGhost(card){ const r=rectIn(card), g=document.createElement('div'); g.className='ghost';
+  Object.assign(g.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'});
+  const face=card.cloneNode(true); face.classList.add('gface'); Object.assign(face.style,{opacity:'1',transform:'none',width:r.w+'px',height:r.h+'px'});
+  const bg=document.createElement('i'); bg.className='gbg'; const tx=document.createElement('span'); tx.className='gtx';
+  g.append(bg,face,tx); app.appendChild(g); return {g,face,bg,tx,r}; }
+async function morphInto(m,el,t){ const ub=$('.ub',el), to=rectIn(ub), D=560;
+  m.tx.textContent=t; m.tx.style.width=(to.w-36)+'px';
+  anim(m.g,[{left:m.r.x+'px',top:m.r.y+'px',width:m.r.w+'px',height:m.r.h+'px',borderRadius:'34.364px'},{left:to.x+'px',top:to.y+'px',width:to.w+'px',height:to.h+'px',borderRadius:'32px 32px 4px 32px'}],{duration:D,easing:IOS});
+  anim(m.face,[{opacity:1,filter:'blur(0px)'},{opacity:0,filter:'blur(2px)'}],{duration:200,easing:'ease-out'});
+  anim(m.bg,[{opacity:0},{opacity:1}],{duration:300,delay:120,easing:INOUT});
+  await anim(m.tx,[{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:250,delay:D-180,easing:OUT});
+  el.style.opacity=''; m.g.remove(); const tm=$('time',el); anim(tm,[{opacity:0},{opacity:1}],{duration:250,easing:OUT}); }
+/* chrome da conversa: nav com título à esquerda + minimizar, fundo #f0f1f1, input neutro — tudo em transição */
+function setConvChrome(on){ nav.classList.toggle('conv',on); $('#lightL').classList.toggle('conv',on); ask.classList.toggle('conv',on); }
+/* o gradient em movimento fica só no componente de que a IA está falando agora */
+function setLive(el){ $$('.cardL.live',conv).forEach(c=>c.classList.remove('live')); if(el) el.classList.add('live'); }
+/* V2: "pensando" com o sparkle do Sparkle Lab (órbita 3D) + texto com shimmer; com uma lista, os textos se revezam (streaming do raciocínio) */
+const THINK_PACE=1.7; // V2: o pensamento dura ~70% a mais antes da resposta, pra dar tempo de ler cada etapa
+async function thinking(ms,label='Pensando'){ setLive(null); ms*=THINK_PACE; const labels=Array.isArray(label)?label:[label];
+  const d=node(`<div class="ai think"><span class="lbl">${labels[0]}</span></div>`); d.prepend(ThinkSpark.make()); await push(d,{dist:8,dur:420});
+  for(let i=1;i<labels.length;i++){ await wait(ms); await swapText($('.lbl',d),labels[i]); }
+  await wait(ms); d.classList.add('done'); await anim(d,[{opacity:1},{opacity:0}],{duration:300,easing:'cubic-bezier(.3,0,.8,.15)'}); d.remove(); }
+/* resposta em streaming: a partícula orbita enquanto escreve e para quando termina; cada palavra entra com fade */
+/* V2: a resposta é texto corrido (sem a partícula; ela fica só no "pensando"); **trecho** vira negrito. Cada palavra ainda entra com fade */
+async function aiMsg(t,{type=true,w,pre}={}){ setLive(null); const el=node(`<div class="ai"><p></p></div>`); if(w) el.style.width=w+'px'; const p=$('p',el); if(pre) p.style.whiteSpace='pre-line'; /* pre: respeita as quebras de linha (listas curtas) */ addConv(el); anim(el,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:520,easing:OUT});
+  const toks=[]; t.split(/(\*\*[^*]+\*\*)/).filter(Boolean).forEach(s=>{ const b=s.startsWith('**'); (b?s.slice(2,-2):s).split(/(\s+)/).forEach(w=>{ if(w) toks.push({w,b}); }); });
+  const put=(tk,cls)=>{ if(/^\s+$/.test(tk.w)){ p.appendChild(document.createTextNode(tk.w)); return false; } const s=document.createElement(tk.b?'b':'span'); if(cls) s.className=cls; s.textContent=tk.w; p.appendChild(s); return true; };
+  if(!type||reduced){ toks.forEach(tk=>put(tk)); scrollEnd(); return el; }
+  let n=0; for(const tk of toks){ if(!put(tk,'w')) continue; if(n++%3===0) scrollEnd(); await wait((/[.,;:!?…]$/.test(tk.w)?140:0)+50+Math.random()*14); } // ritmo quase constante; só a pontuação respira
+  scrollEnd(); return el; }
+/* componente inline: entra "vivo" (borda gradient em movimento + linhas construindo) enquanto a IA preenche; depois assenta */
+/* V2 Animação: o card é "gerado na hora" — desenhado em pontos dentro da própria conversa (rola junto, recortado pela tela) e revelado de cima pra baixo.
+   As barras entram já no tamanho final pro desenho traçá-las; quando a revelação começa (74% do desenho) voltam a zero e crescem junto com ela */
+/* V4 · chegada do card: Tinta de luz.
+   · o card (fundo + borda) entra em 400ms; cada linha entra em seguida, a cada 110ms (sobe 6px, desfoque 4px → 0, 500ms)
+   · todo texto da linha chega pintado pelo degradê azul (1,6s correndo) e assenta na cor real em 900ms; depois o degradê é retirado
+   · elementos com fundo próprio (selos, avatares) não recebem a tinta: só entram com a linha
+   · as barras crescem com um brilho azul que se apaga em 900ms */
+const INK_STEP=110;
+function inkTargets(row){ const out=[]; const walk=n=>{ for(const c of n.children){ const cs=getComputedStyle(c); const ownText=[...c.childNodes].some(x=>x.nodeType===3&&x.nodeValue.trim());
+    const hasBg=cs.backgroundImage!=='none'||!/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(cs.backgroundColor);
+    if(ownText&&!hasBg) out.push(c); if(!hasBg) walk(c); } };
+  if([...row.childNodes].some(x=>x.nodeType===3&&x.nodeValue.trim())) out.push(row); walk(row); return out; }
+async function card(html,cls=''){ await wait(450);
+  const el=node(`<div class="cardL gen ${cls}">${html}</div>`); setLive(el);
+  const rows=[...el.children], bars=$$('.bar i,.cr .b,.grp i,.trk i',el);
+  addConv(el); scrollEnd();
+  if(reduced){ bars.forEach(b=>{ b.style.width=b.dataset.w; }); await wait(300); return el; }
+  rows.forEach(r=>r.style.opacity='0');
+  anim(el,[{opacity:0},{opacity:1}],{duration:400,easing:OUT});
+  rows.forEach((r,i)=>{ const d=200+i*INK_STEP, ts=inkTargets(r);
+    ts.forEach(t=>{ t.style.setProperty('--c',getComputedStyle(t).color); t.style.animationDelay=d+'ms'; t.classList.add('inkt');
+      setTimeout(()=>t.classList.add('settled'),d+1100); setTimeout(()=>{ t.classList.remove('inkt','settled'); t.style.animationDelay=''; t.style.removeProperty('--c'); },d+2100); });
+    anim(r,[{opacity:0,transform:'translateY(6px)',filter:'blur(4px)'},{opacity:1,transform:'none',filter:'blur(0px)'}],{duration:500,delay:d,easing:'cubic-bezier(.22,1,.36,1)'});
+    r.style.opacity='';
+    $$('.bar i,.cr .b,.grp i,.trk i',r).concat(r.matches('.bar,.trk')?[...r.children]:[]).forEach(b=>{ setTimeout(()=>{ b.style.width=b.dataset.w; if(!b.classList.contains('prev')) b.classList.add('lit'); },d+140); setTimeout(()=>b.classList.remove('lit'),d+1100); }); });
+  await wait(200+rows.length*INK_STEP+1100); return el; }
+/* feedback da resposta: 👍 👎 copiar ouvir */
+async function feedback(){ setLive(null); const ic=[['up','thumbup','Gostei'],['down','thumbdown','Não gostei'],['copy','copy','Copiar'],['vol','volume','Ouvir']];
+  const el=node(`<div class="fbk">${ic.map(([k,f,l])=>`<button data-k="${k}" aria-label="${l}"><img src="conv/${f}.svg" width="16" height="16" alt=""></button>`).join('')}</div>`);
+  el.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const k=b.dataset.k;
+    anim(b,[{transform:'scale(1)'},{transform:'scale(1.3)'},{transform:'scale(1)'}],{duration:360,easing:SPRING});
+    if(k==='up'||k==='down'){ $$('button',el).forEach(x=>x.classList.toggle('on',x===b)); el.classList.add('voted'); showToast('Valeu pelo retorno'); }
+    else showToast(k==='copy'?'Resposta copiada':'Leitura em voz alta em breve'); });
+  await wait(250); return push(el,{dist:6,dur:520}); }
+/* sugestões: pílulas fixas acima do input (não entram na conversa); cada uma pode levar um texto de pergunta e um fluxo próprios */
+/* V4: as pills mostram que foram pensadas na hora — o vidro entra em cascata e o texto chega pintado pela tinta de luz (o mesmo degradê dos cards), assentando na cor real */
+async function suggest(list){ setLive(null); const box=$('#sugg'); box._list=list; box.innerHTML=list.map((c,i)=>`<button class="${c.alt?'alt':''}" data-i="${i}"><span>${c.t}</span></button>`).join(''); box.scrollLeft=0; clearAnim(box); box.classList.remove('hidden');
+  const bs=$$('button',box); bs.forEach(b=>b.style.opacity='0'); await wait(300); stagger(bs,{dist:14,delay:70,dur:640});
+  if(reduced) return;
+  bs.forEach((b,i)=>{ const t=b.firstChild, d=160+i*90; t.style.display='inline-block'; t.style.setProperty('--c',getComputedStyle(t).color); t.style.animationDelay=d+'ms'; t.classList.add('inkt');
+    anim(t,[{opacity:0,filter:'blur(4px)'},{opacity:1,filter:'blur(0px)'}],{duration:500,delay:d,easing:'cubic-bezier(.22,1,.36,1)'});
+    setTimeout(()=>t.classList.add('settled'),d+1100); setTimeout(()=>{ t.classList.remove('inkt','settled'); t.style.animationDelay=''; t.style.removeProperty('--c'); },d+2100); }); }
+function hideSugg(instant){ const box=$('#sugg'); if(box.classList.contains('hidden')) return; const done=()=>{ box.classList.add('hidden'); box.innerHTML=''; clearAnim(box); };
+  if(instant) return done(); anim(box,[{opacity:1,transform:'none'},{opacity:0,transform:'translateY(8px)'}],{duration:220,easing:'ease-in'}).then(done); }
+$('#sugg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||S.busy) return; const c=$('#sugg')._list[+b.dataset.i]; const q=c.q||c.t; startConversation(q,c.flow!=null?c.flow:route(q)); });
+async function actions(primary,secondary,onP,onS){ setLive(null); const el=node(`<div class="acts"><button class="btnP"><img src="conv/arrow-right.svg" width="24" height="24" alt=""><span>${primary}</span></button>${secondary?`<button class="btnS">${secondary}</button>`:''}</div>`); const bp=$('.btnP',el), bs=$('.btnS',el), fp=onP||(()=>showToast(primary+' · em breve')), fs=onS||(()=>showToast(secondary+' · em breve')); const lock=()=>[bp,bs].forEach(b=>{ if(b){ b.disabled=true; b.setAttribute('aria-disabled','true'); } }); /* regra: escolhida uma das opções, as duas ficam desabilitadas */ bp.addEventListener('click',function(e){ if(bp.disabled) return; fp.call(this,e); lock(); }); if(bs) bs.addEventListener('click',function(e){ if(bs.disabled) return; fs.call(this,e); lock(); }); await wait(300); return push(el,{dist:20}); }
+async function iconActions(list){ setLive(null); const el=node(`<div class="acts2">${list.map(a=>`<button><svg><use href="#${a.icon}"/></svg><span>${a.label}</span></button>`).join('')}</div>`); $$('button',el).forEach((b,i)=>b.addEventListener('click',()=>showToast(list[i].label+' · em breve'))); await wait(300); return push(el,{dist:20}); }
+const chips=list=>suggest(list.map(t=>({t}))); // os outros cenários seguem chamando chips(['…'])
+const step=(t,icon)=>`<div class="step"><span class="dot"><svg><use href="#${icon}"/></svg></span><span>${t}</span></div>`; // o ícone de cada linha fala do conteúdo dela
+const kv=(k,v,b)=>`<div class="kv"><span>${k}</span>${b?`<b>${v}</b>`:`<span>${v}</span>`}</div>`;
+
+/* ---------- roteiros ---------- */
+async function runFlow(text,flow){
+  const follow=!!conv.querySelector('.um'); // turno novo numa conversa já aberta: a pergunta ancora no topo
+  await userMsg(text,{anchorTop:follow}); await wait(400);
+  if(flow===1) return flowCashback();
+  if(flow===2) return flowGastos();
+  if(flow===21) return flowPlano();
+  if(flow===22) return flowInvestir();
+  if(flow===3) return flowQuanto();
+  if(flow===5) return flowDelivery();
+  if(flow===6) return flowOrcamento();
+  if(flow===7) return flowLazer();
+  if(flow===23) return flowAviso();
+  return flowGeneric(text);
+}
+async function flowCashback(){
+  await thinking(1150,['Lendo seu cashback…','Somando outubro…','Preparando o resumo…']);
+  await aiMsg('Seu cartão Neon devolve 1% de tudo que você compra no crédito, direto na conta. Em outubro foi assim:');
+  await card(`<div class="lab">Cashback · outubro</div><div class="big">R$ 18,40</div>${kv('Compras no crédito','R$ 1.840,00')}${kv('Cai na conta','05/11',1)}<div class="dv"></div>${kv('Acumulado em 2026','R$ 212,90',1)}<div class="bar"><i data-w="62%"></i></div><div class="note">Faltam R$ 87 em cashback para a meta de R$ 300 que você definiu pro ano.</div>`);
+  await thinking(1100);
+  await aiMsg('Três coisas que vale saber:');
+  await card(`${step('Vale em qualquer compra no crédito, sem valor mínimo','i-card')}${step('Cai na conta até 5 dias depois do fechamento da fatura','i-cal')}${step('Pix no crédito também conta, se você ativar','i-pix')}`);
+  await actions('Ativar cashback no Pix no crédito','Ver extrato de cashback',function(){ showToast('Pronto: Pix no crédito agora dá cashback'); },null);
+  await chips(['Quanto vou receber em novembro?','Quanto posso gastar?']);
+}
+/* Análise de gastos — Figma 2927-15533 (comparação), 2927-27779 (pedidos) e 2927-18819 (plano/caixinha) */
+const po=(av,n,d,v)=>`<div class="po"><span class="av">${av}</span><span class="pn"><b>${n}</b><small>${d}</small></span><span class="pv">${v}</span></div>`;
+const grp=(n,v,a,b,w)=>`<div class="grp"${w?` style="width:${w}px"`:''}><div class="top"><span>${n}</span><span>${v}</span></div><i data-w="${a}px"></i><i class="prev" data-w="${b}px"></i></div>`;
+async function flowGastos(){
+  await thinking(1150,['Analisando seus gastos…','Comparando com setembro…','Separando por categoria…']);
+  await aiMsg('Você gastou R$ 1635 a mais que em Agosto. Os maiores aumentos foram em **delivery e lazer.**');
+  await card(`<div class="leg2"><span><img src="conv/dot-out.svg" alt="">Outubro</span><span><img src="conv/dot-set.svg" alt="">Setembro</span></div>
+    ${grp('Delivery','+ R$ 441',251,126)}${grp('Transporte','+ R$ 139',109,71,318)}${grp('Lazer','+ R$ 555',318,199,318)}`,'c-chart');
+  await feedback();
+  await thinking(1400,'Olhando os pedidos');
+  await aiMsg('Foram **14** pedidos, média de **R$ 63**. Nove deles depois das 22h, quase sempre de **quinta a sábado**.');
+  await card(`${po('MA','iFood · Madero','19 out · 23:12','R$ 89,90')}${po('BK','iFood · Burger King','17 out · 22:40','R$ 52,80')}${po('99',"99Food · Habib's",'16 out · 22:05','R$ 47,60')}${po('SP','iFood · Spoleto','12 out · 13:10','R$ 44,90')}
+    <div class="dv2"></div><div class="tot"><span>+ 10 pedidos</span><b>Total R$ 882,00</b></div>`,'c-orders');
+  await feedback();
+  await suggest([{t:'Faça um plano para economizar',q:'Faça um plano para me ajudar a economizar',flow:21},{t:'Analisar padrão de gastos'},{t:'Analisar meus gastos',alt:1}]);
+}
+async function flowPlano(){
+  await thinking(1300,'Montando um plano');
+  await aiMsg('Se você pedir uns **8 deliveries** por mês em vez de 14, sobram **R$ 378**. Que tal guardar **R$ 200/mês** pra viagem de dezembro?');
+  await card(`<div class="bh"><span>CAIXINHA · VIAGEM DEZEMBRO</span><em>Compatível com perfil Conservador</em></div><div class="big2">R$ 200 todo dia 5</div>
+    <div class="kvs"><div><span>Rendimento</span><b>100% do CDI · 13,65% a.a.</b></div><div><span>Liquidez</span><b>resgate quando quiser</b></div><div><span>Em dezembro</span><b>~ R$ 402</b></div></div>`,'c-box');
+  await feedback();
+  await suggest([{t:'Quero investir',q:'Quero investir R$ 200 todo dia 5 na caixinha',flow:22},{t:'Mostrar mais opções de CDB'},{t:'Definir limite de delivery'}]);
+}
+/* ---------- V4 · fluxos dos cards da home (Figma 3066-27466): a resposta entrega o que o card promete ----------
+   Os números conversam com o resto do protótipo: delivery de outubro R$ 882 (+R$ 441 sobre setembro), 14 pedidos;
+   hoje é sexta, 23/10 — faltam 9 dias pro mês fechar e o fim de semana é 24 e 25/10 */
+const LEG=`<div class="leg2"><span><img src="conv/dot-out.svg" alt="">Outubro</span><span><img src="conv/dot-set.svg" alt="">Setembro</span></div>`;
+/* card 1 · "Delivery foi seu maior gasto neste mês. Quer entender o que mais pesou?" → quanto foi, em que horário pesou, quais pedidos */
+async function flowDelivery(){
+  await thinking(1150,['Separando seus pedidos de delivery…','Comparando com setembro…','Procurando o que mais pesou…']);
+  await aiMsg('Delivery foi seu maior gasto em outubro: **R$ 882** em **14 pedidos**, R$ 441 a mais que em setembro. O que mais pesou foram os pedidos **depois das 22h**.');
+  await card(`${LEG}${grp('Depois das 22h','R$ 612',318,130)}${grp('Almoço','R$ 186',97,62,318)}${grp('Jantar até 22h','R$ 84',44,36,318)}`,'c-chart');
+  await feedback();
+  await thinking(1300,'Olhando os pedidos da noite');
+  await aiMsg('Foram **9 pedidos** depois das 22h, quase sempre de **quinta a sábado**, com média de **R$ 68**. Os maiores foram estes:');
+  await card(`${po('OB','iFood · Outback','18 out · 23:30','R$ 96,40')}${po('MA','iFood · Madero','19 out · 23:12','R$ 89,90')}${po('BK','iFood · Burger King','17 out · 22:40','R$ 52,80')}${po('99',"99Food · Habib's",'16 out · 22:05','R$ 47,60')}
+    <div class="dv2"></div><div class="tot"><span>+ 5 pedidos</span><b>Total R$ 612,00</b></div>`,'c-orders');
+  await feedback();
+  await suggest([{t:'Faça um plano para economizar',q:'Faça um plano para me ajudar a economizar no delivery',flow:21},{t:'Definir limite de delivery'},{t:'Analisar meus gastos',q:'Pode fazer uma análise dos meus gastos de outubro?',flow:2}]);
+}
+/* card 2 · "Você já usou 70% do seu orçamento do mês. Vamos planejar o restante?" → onde está o orçamento, o que já tem dono, como dividir o resto */
+const lim=(n,v,pct,note)=>`<div class="lim"><div class="lt"><span>${n}</span><b>${v}</b></div><div class="trk"><i data-w="${pct}%"></i></div><small>${note}</small></div>`;
+/* ativação: confirma o que foi ligado, no estilo do "Plano criado" */
+async function limitsOn(){ if(S.busy) return; S.busy=true; ask.classList.add('busy'); hideSugg();
+  await thinking(900,['Criando os limites…','Separando os imprevistos…']);
+  await card(`<div class="ok"><span class="okic"><svg><use href="#i-check"/></svg></span><div><b>Limites ativos até 31/10</b><small>Você pode pausar ou mudar quando quiser</small></div></div><div class="dv2"></div>
+    <div class="kvs"><div><span>Categorias com limite</span><b>3</b></div><div><span>Avisos</span><b>em 80% e ao passar</b></div><div><span>Ritmo do dia</span><b>até R$ 97</b></div><div><span>Caixinha Imprevistos</span><b>R$ 100 guardados</b></div></div>`,'c-box c-plan');
+  await suggest([{t:'Me mostra um aviso de exemplo',flow:23},{t:'Ajustar o limite do mercado'},{t:'Onde usei os 70%?',q:'Onde usei meu orçamento este mês?',flow:2}]);
+  setLive(null); S.busy=false; ask.classList.remove('busy'); }
+/* prévia do aviso de 80% */
+async function flowAviso(){
+  await thinking(800,'Preparando um exemplo');
+  await aiMsg('Quando uma categoria chegar em **80%**, você recebe algo assim:');
+  await card(`<div class="notif"><span class="nic"><img src="home/spark.svg" alt=""></span><div><div class="nt1"><b>IA Neon</b><small>agora</small></div><p>Delivery e lazer chegou em 80%: você já usou R$ 188 de R$ 235. Faltam 4 dias pro mês fechar.</p></div></div>`,'c-notif');
+  await suggest([{t:'Ajustar o limite do mercado'},{t:'Onde usei os 70%?',q:'Onde usei meu orçamento este mês?',flow:2},{t:'Analisar meus gastos',q:'Pode fazer uma análise dos meus gastos de outubro?',flow:2}]);
+}
+async function flowOrcamento(){
+  await thinking(1150,['Somando o que você já gastou…','Vendo as contas que ainda vencem…','Montando o plano…']);
+  await aiMsg('Seu orçamento de outubro é **R$ 4.000** e você já usou **R$ 2.800**. Até o dia 31 sobram **R$ 1.200**, mas uma parte já tem destino:');
+  await card(`<div class="lab3">ORÇAMENTO DE OUTUBRO · 70% USADO</div><div class="big2">R$ 1.200,00 restantes</div><div class="trk"><i data-w="225px"></i></div><div class="nt">Faltam 9 dias para o mês fechar.</div><div class="dv2"></div>
+    ${kvf('Orçamento do mês','R$ 4.000,00',1)}${kvf('Já usado','− R$ 2.800,00')}${kvf('Luz e internet · 30/10','− R$ 124,30')}${kvf('Reserva automática · 31/10','− R$ 200,00')}${kvf('Livre para o dia a dia','R$ 875,70',1)}`,'c-free');
+  await thinking(1200,'Dividindo o que sobra');
+  await aiMsg('Com **R$ 875** livres, dá uns **R$ 97 por dia**. Pelo seu jeito de gastar, eu colocaria estes limites até o dia 31:');
+  // V3/V4: o card deixa claro que são TETOS (não depósitos): cada categoria com o limite, o que já foi usado e uma nota
+  await card(`<div class="bh"><span>LIMITES ATÉ 31/10</span><em>Sugestão da IA Neon</em></div><div class="big2">R$ 875 em 9 dias</div>
+    <div class="lims">${lim('Mercado','R$ 360',0,'nada usado ainda')}${lim('Transporte','R$ 180',10,'já usou R$ 18 hoje')}${lim('Delivery e lazer','R$ 235',17,'já usou R$ 40 hoje')}${lim('Imprevistos','R$ 100',0,'fica guardado numa caixinha')}</div>`,'c-box c-lim');
+  // o que acontece ao ativar, dito antes do botão
+  await aiMsg('Se você ativar, eu acompanho seus gastos até o dia 31 e:\n· te aviso quando uma categoria chegar em **80% do limite**;\n· te aviso se um dia passar de **R$ 97**;\n· guardo os **R$ 100 de imprevistos** numa caixinha, pra não misturar.\nNada é bloqueado e o resto do dinheiro continua na sua conta.',{pre:true});
+  await actions('Ativar limites e avisos','Ajustar valores',function(){ if(this.dataset.done) return; this.dataset.done='1'; limitsOn(); },function(){ showToast('Ajustar valores · em breve'); });
+  await suggest([{t:'Onde usei os 70%?',q:'Onde usei meu orçamento este mês?',flow:2},{t:'Me mostra um aviso de exemplo',flow:23},{t:'Analisar meus gastos',q:'Pode fazer uma análise dos meus gastos de outubro?',flow:2}]);
+}
+/* card 3 · "Você ainda tem R$ 150 no orçamento de lazer. Vamos planejar o fim de semana?" → um fim de semana que cabe nos R$ 150 + separar o valor */
+async function flowLazer(){
+  await thinking(1150,['Olhando seu orçamento de lazer…','Vendo o que você costuma fazer no fim de semana…','Montando o plano…']);
+  await aiMsg('Do seu orçamento de lazer de outubro, sobraram **R$ 150**. Pelo que você costuma fazer, dá para um fim de semana assim:');
+  await card(`<div class="bh"><span>FIM DE SEMANA · 24 E 25/10</span><em>Cabe no orçamento</em></div><div class="big2">R$ 150 para o fim de semana</div>
+    <div class="kvs"><div><span>Sábado · cinema a dois</span><b>R$ 64</b></div><div><span>Sábado · jantar fora</span><b>R$ 56</b></div><div><span>Domingo · sorvete no parque</span><b>R$ 30</b></div></div>`,'c-box');
+  await feedback();
+  await thinking(1100);
+  await aiMsg('Quer que eu separe esses **R$ 150** numa caixinha de lazer? Assim o dinheiro não se mistura com o resto e você vê quanto ainda pode gastar.');
+  await actions('Separar R$ 150 numa caixinha',null,function(){ showToast('Pronto: R$ 150 guardados para o fim de semana'); },null);
+  await suggest([{t:'Me lembrar no sábado de manhã'},{t:'Ver opções mais baratas'},{t:'Analisar meus gastos',q:'Pode fazer uma análise dos meus gastos de outubro?',flow:2}]);
+}
+
+/* V4 · "Quero investir" (depois do plano da caixinha): a IA cria o plano e confirma com o componente "Plano criado" */
+async function flowInvestir(){
+  await thinking(1150,['Criando sua caixinha…','Agendando o depósito todo dia 5…','Ativando os avisos…']);
+  await aiMsg('Prontinho! Criei a **Caixinha Viagem de dezembro** e agendei **R$ 200 todo dia 5**. Um dia antes de cada depósito eu te aviso, pra você conferir se está tudo certo.');
+  await card(`<div class="ok"><span class="okic"><svg><use href="#i-check"/></svg></span><div><b>Plano criado</b><small>Caixinha · Viagem de dezembro</small></div></div><div class="dv2"></div>
+    <div class="kvs"><div><span>Depósito automático</span><b>R$ 200 todo dia 5</b></div><div><span>Primeiro depósito</span><b>05/11</b></div><div><span>Aviso antes</span><b>todo dia 4, às 9h</b></div><div><span>Rendimento</span><b>100% do CDI</b></div><div><span>Em dezembro</span><b>~ R$ 402</b></div></div>`,'c-box c-plan');
+  await actions('Ver minha caixinha','Mudar valor ou data');
+  await suggest([{t:'Guardar mais neste mês'},{t:'Definir limite de delivery'},{t:'Analisar meus gastos',q:'Pode fazer uma análise dos meus gastos de outubro?',flow:2}]);
+}
+
+/* Quanto posso gastar — Figma 2927-27408 (card) e 2927-27557 (aviso) */
+const kvf=(k,v,b)=>`<div class="kvf"><span>${k}</span>${b?`<b>${v}</b>`:`<em>${v}</em>`}</div>`;
+async function flowQuanto(){
+  await thinking(1150,['Olhando suas contas até o dia 5…','Calculando o que sobra…','Quase lá…']);
+  await aiMsg('Até o dia **05/10**, você pode gastar **R$ 1.240** sem comprometer suas contas fixas.');
+  await card(`<div class="lab3">LIVRE PRA GASTAR ATÉ 05/11</div><div class="big2">R$ 1.240,00</div><div class="trk"><i data-w="200px"></i></div><div class="nt">R$ 88 por dia nos próximos 14 dias.</div><div class="dv2"></div>
+    ${kvf('Saldo hoje','R$ 3.812,50',1)}${kvf('Aluguel · 30/10','− R$ 1.650,00')}${kvf('Fatura do cartão · 03/11','− R$ 598,20')}${kvf('Luz e internet · 05/11','− R$ 124,30')}${kvf('Reserva automática · 05/11','− R$ 200,00')}`,'c-free');
+  await thinking(1200);
+  await aiMsg('Seu salário entra dia **05**, então essa conta se renova. Quer que eu crie um aviso para quando passar de R$ 88,00 em um dia?',{w:335});
+  await actions('Criar aviso',null,function(){ showToast('Te aviso por aqui e por notificação'); },null);
+  await suggest([{t:'Analisar meus gastos do mês'},{t:'Criar aviso para quando ...',q:'Criar aviso para quando passar de R$ 88 num dia'},{t:'Analisar meus gastos',alt:1}]);
+}
+async function flowGeneric(text){
+  await thinking(1150,['Entendendo o pedido…','Buscando seus dados…']);
+  const t=text.toLowerCase();
+  if(/boleto/.test(t)){ await aiMsg('Me manda a foto do boleto ou cola o código de barras aqui que eu pago na hora.'); await iconActions([{icon:'i-cam',label:'Tirar foto'},{icon:'i-paste',label:'Colar código'}]); }
+  else if(/cdb|invest/.test(t)){ await aiMsg('Com seu perfil Conservador, estes CDBs fazem sentido hoje:'); await card(`${kv('CDB Neon · 180 dias','105% do CDI',1)}${kv('CDB Neon · 1 ano','109% do CDI',1)}${kv('CDB Neon · 2 anos','113% do CDI',1)}<div class="dv"></div><div class="note">Todos com garantia do FGC até R$ 250 mil. CDI hoje: 13,65% a.a.</div>`); await actions('Simular com R$ 1.000','Ver todos'); }
+  else if(/fatura|limite/.test(t)){ await aiMsg('Sua fatura de outubro fechou em R$ 598,20 e vence dia 3. Seu limite total é R$ 4.000, com R$ 2.870 disponíveis.'); await card(`${kv('Fatura atual','R$ 598,20',1)}${kv('Vencimento','03/11')}${kv('Limite disponível','R$ 2.870,00',1)}<div class="bar"><i data-w="28%"></i></div>`); await actions('Pagar fatura','Pedir aumento de limite'); }
+  else if(/cart[aã]o/.test(t)){ await aiMsg('Seu cartão de crédito está ativo, com limite de R$ 4.000 e fatura fechando dia 27. Quer ver os dados do cartão virtual?'); await actions('Ver cartão virtual','Bloquear cartão'); }
+  else { await aiMsg('Entendi. Posso te ajudar com fatura, cartão, cashback, gastos e investimentos. Por onde quer começar?'); await chips(['Analisar meus gastos','Quanto posso gastar?','Entenda mais sobre cashback']); }
+}
+
+/* ---------- histórico (azul, por baixo da tela) ---------- */
+/* V2: 3 fixados (Figma); recentes mostram 5 e o resto entra no "Mostrar tudo" */
+const PINS=['Plano para economizar para o Natal','Gestão de entrada e saída da empresa','Contestação da compra na KaBuM!'];
+const RECS=['Por que meu saldo caiu?','Dividir a conta do Coco Bambu','Opções de CDB pra 1 ano','Aumentar o limite do cartão','Pix agendado da academia','Caixinha viagem de dezembro','Fatura de outubro','Cashback do Pix no crédito','Golpe da falsa central','Reserva de emergência','Parcelar a fatura em 3x'];
+/* V3: fixados escondidos por enquanto (Figma 3062-26855: só "Recentes", 9 conversas antes do "Mostrar tudo").
+   Nada foi apagado: a seção, os ícones de alfinete e os estilos continuam aqui. Pra voltar, é só trocar SHOW_PINS pra true */
+const SHOW_PINS=false;
+const HIST_N=SHOW_PINS?5:9;
+function histRow(t,pin){ const b=document.createElement('button'); b.className=pin?'pin':'rc'; b.innerHTML=pin?`<i><img src="hist/pin.svg" width="24" height="24" alt=""></i><span>${t}</span>`:`<span>${t}</span>`; b.addEventListener('click',()=>{ closeHist(); showToast('Abrindo "'+t+'"'); }); return b; }
+function buildHist(){ const l=$('#histList'); l.classList.remove('long'); l.scrollTop=0;
+  l.innerHTML=`<div class="sec${SHOW_PINS?'':' hidden'}">Fixados</div><div class="pins${SHOW_PINS?'':' hidden'}"></div><div class="sec rec${SHOW_PINS?'':' first'}">Recentes</div><div class="recs"></div>`;
+  PINS.forEach(t=>$('.pins',l).appendChild(histRow(t,true)));
+  const LIST=SHOW_PINS?RECS:[...PINS,...RECS]; // sem fixados, as conversas que estavam fixadas entram no topo dos recentes
+  const recs=$('.recs',l); LIST.slice(0,HIST_N).forEach(t=>recs.appendChild(histRow(t)));
+  const more=document.createElement('button'); more.className='more'; more.textContent='Mostrar tudo'; recs.appendChild(more);
+  more.addEventListener('click',()=>{ const extra=LIST.slice(HIST_N).map(t=>histRow(t)); extra.forEach(r=>recs.insertBefore(r,more)); l.classList.add('long');
+    anim(more,[{opacity:1},{opacity:0}],{duration:160}).then(()=>more.remove()); stagger(extra,{dist:-14,delay:28,dur:620,from:'x'}); });
+}
+/* busca: a lupa se estica num campo (mesma curva iOS do deslize do app); título e lista saem, "Resultados" entra */
+let searchOn=false;
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+function renderRes(){ const q=norm($('#hsIn').value.trim()), box=$('#hRes .res'); box.innerHTML=''; if(!q) return;
+  const hits=[...PINS,...RECS].filter(t=>norm(t).includes(q));
+  const rows=hits.length?hits.map(t=>histRow(t)):[Object.assign(document.createElement('div'),{className:'empty',textContent:'Nenhuma conversa encontrada'})];
+  rows.forEach(r=>box.appendChild(r)); stagger(rows,{dist:8,delay:30,dur:420}); }
+function openSearch(){ if(searchOn) return; searchOn=true;
+  const hs=$('#hSearch'), ico=$('#hsIco'), t=$('#histC .hh .t'), sb=$('#histSearch'), l=$('#histList'), res=$('#hRes'), inp=$('#hsIn');
+  inp.value=''; $('.res',res).innerHTML=''; hs.classList.add('on'); sb.style.opacity='0';
+  anim(t,[{opacity:1,transform:'none'},{opacity:0,transform:'translateX(-12px)'}],{duration:220,easing:'ease-in'});
+  anim(hs,[{clipPath:'inset(0px 4px 0px 241px round 24px)'},{clipPath:'inset(0px 0px 0px 0px round 24px)'}],{duration:560,easing:IOS});
+  anim(ico,[{transform:'translateX(236px)'},{transform:'none'}],{duration:560,easing:IOS});
+  anim(inp,[{opacity:0},{opacity:1}],{duration:300,delay:260,easing:OUT});
+  anim($('#hsClose'),[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'none'}],{duration:250,delay:320,easing:OUT}); // o fechar chega depois que o campo abriu
+  anim(l,[{opacity:1,transform:'none'},{opacity:0,transform:'translateY(10px)'}],{duration:240,easing:'ease-in'}).then(()=>{ if(searchOn) l.classList.add('hidden'); });
+  res.classList.remove('hidden'); stagger([$('.sec',res)],{dist:10,dur:560,start:220});
+  setTimeout(()=>{ if(searchOn) kbSearch(true); },120); // o teclado sobe logo atrás do campo abrindo
+  setTimeout(()=>{ if(searchOn) inp.focus({preventScroll:true}); },320); }
+/* teclado da busca: sobe sozinho, sem empurrar o input da IA (que está no app deslizado) */
+function kbSearch(on){ S.kb=on; $('#kb').classList.toggle('on',on); }
+$('#hsIn').addEventListener('pointerdown',()=>{ if(searchOn&&!S.kb) kbSearch(true); });
+document.addEventListener('pointerdown',e=>{ if(searchOn&&S.kb&&!e.target.closest('#kb,#hSearch')) kbSearch(false); },true);
+function closeSearch(instant){ if(!searchOn) return; searchOn=false; if(S.kb) kbSearch(false);
+  const hs=$('#hSearch'), ico=$('#hsIco'), t=$('#histC .hh .t'), sb=$('#histSearch'), l=$('#histList'), res=$('#hRes'), inp=$('#hsIn'); inp.blur();
+  const done=()=>{ hs.classList.remove('on'); sb.style.opacity=''; res.classList.add('hidden'); $('.res',res).innerHTML=''; [hs,ico,inp,t,l].forEach(clearAnim); hs.style.clipPath=''; };
+  l.classList.remove('hidden');
+  if(instant){ done(); return; }
+  anim(res,[{opacity:1},{opacity:0}],{duration:200,easing:'ease-in'}).then(()=>clearAnim(res));
+  anim(inp,[{opacity:1},{opacity:0}],{duration:160,easing:'ease-in'});
+  anim($('#hsClose'),[{opacity:1},{opacity:0}],{duration:120,easing:'ease-in'}).then(()=>clearAnim($('#hsClose')));
+  anim(ico,[{transform:'none'},{transform:'translateX(236px)'}],{duration:480,easing:IOS});
+  anim(hs,[{clipPath:'inset(0px 0px 0px 0px round 24px)'},{clipPath:'inset(0px 4px 0px 241px round 24px)'}],{duration:480,easing:IOS}).then(()=>{ if(!searchOn) done(); });
+  anim(t,[{opacity:0,transform:'translateX(-12px)'},{opacity:1,transform:'none'}],{duration:520,delay:200,easing:OUT});
+  anim(l,[{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:560,delay:180,easing:OUT}); }
+$('#hsIn').addEventListener('input',renderRes);
+$('#hsIn').addEventListener('keydown',e=>{ if(e.key==='Escape') closeSearch(); });
+$('#hsIco').addEventListener('click',()=>closeSearch());
+$('#hsClose').addEventListener('click',()=>closeSearch());
+let histOpen=false;
+function openHist(){ if(histOpen||S.screen==='intro'||S.screen==='think'||S.screen==='faq') return; histOpen=true; recReset(); closeAsk(); closeSearch(true); buildHist(); $('#histL').classList.remove('hidden'); histBgOn(); setDark(false); status.classList.add('hist');
+  app.classList.add('shifted'); const items=[$('#histC .hh'),...$$('#histList .sec,#histList .pin,#histList .rc,#histList .more'),$('#newChat')]; stagger(items,{dist:-14,delay:28,dur:620,start:150,from:'x'}); }
+function closeHist(instant){ if(!histOpen&&!instant) return; histOpen=false; app.classList.remove('shifted'); status.classList.remove('hist'); setDark(S.screen!=='intro'); setTimeout(()=>{ if(!histOpen){ $('#histL').classList.add('hidden'); histBgOff(); closeSearch(true); } },instant?0:650); }
+$('#menuBtn').addEventListener('click',openHist);
+app.addEventListener('click',e=>{ if(app.classList.contains('shifted')) closeHist(); },true);
+/* swipe horizontal na tela: pra direita abre o menu, pra esquerda fecha (um swipe que começa no carrossel é do carrossel) */
+(()=>{ const sc=$('#screen'); let sw=null;
+  sc.addEventListener('pointerdown',e=>{ if(e.button!==0) return; sw={x:e.clientX,y:e.clientY,t:performance.now(),car:!!e.target.closest('#carousel,#sugg'),open:histOpen}; },true);
+  const end=e=>{ if(!sw) return; const dx=e.clientX-sw.x, dy=e.clientY-sw.y; const s=sw; sw=null;
+    if(Math.abs(dx)<50||Math.abs(dy)>Math.abs(dx)*.7) return;
+    if(dx>0&&!s.open&&!s.car){ openHist(); } else if(dx<0&&s.open){ closeHist(); } };
+  document.addEventListener('pointerup',end,true); document.addEventListener('mouseup',e=>{ if(sw) end(e); },true);
+  document.addEventListener('pointercancel',()=>{ sw=null; },true);
+})();
+$('#histSearch').addEventListener('click',openSearch);
+$('#newChat').addEventListener('click',()=>{ closeHist(); setTimeout(goHome,300); });
+$('#minBtn').addEventListener('click',()=>showToast('Minimizar a IA Neon em breve'));
+$('#closeBtn').addEventListener('click',()=>{ if(S.screen==='conv') goHome(); else showToast('Fechar a IA Neon volta pro app'); });
+
+/* ---------- CONVERSA → HOME (sem intro) ---------- */
+async function goHome(){ recReset();
+  if(S.busy&&S.screen!=='conv') return; S.busy=false; ask.classList.remove('busy'); closeAsk();
+  if(S.screen==='home') return;
+  // V3: o título volta pro centro junto com a saída da conversa (saída curta: 240ms, sem atraso)
+  setConvChrome(false); $('#hdr').classList.remove('on');
+  const items=[...$$('#conv > *')]; outDown(items,{dist:12,delay:20,dur:240}); anim(ask,[{opacity:1},{opacity:0}],{duration:240});
+  await wait(280);
+  $('#convL').classList.add('hidden'); conv.innerHTML=''; anchor=null; hideSugg(true); clearAnim(ask); $('#scrim').classList.remove('on');
+  S.screen='home'; $('#homeL').classList.remove('hidden'); applyFlowHome(); $('#navSpark').style.opacity='1';
+  homeCascade(0,{withNav:false});
+}
+
+/* ---------- chips de cenário (fora do celular) ---------- */
+$$('#flows button[data-flow]').forEach(b=>b.addEventListener('click',()=>{ S.flow=+b.dataset.flow; applyFlowHome(); restart(); }));
+$('#restart').addEventListener('click',()=>restart());
+function restart(){ recReset(); if(faqOn) faqKb(false); if(S.morph){ S.morph.g.remove(); S.morph=null; } closeHist(true); S.busy=false; S.pending=null; conv.innerHTML=''; glOff('gl3'); $$('#homeIco,#homeTitle,.card,#prompts button').forEach(clearAnim); clearAnim(ask);
+  /* "Pela navbar" (flow 2) começa direto na splash da IA, sem a home do app antes; "Pela FAQ" (flow 4) abre a Ajuda */
+  if(S.flow===3){ S.screen='restart'; showPlaceholder(S.flow); } else if(S.flow===4){ S.screen='restart'; showFaq(); } else { S.screen='restart'; ['#entry2','#faqL'].forEach(s=>$(s).classList.add('hidden')); intro(); } }
+
+/* ---------- start ---------- */
+intro();
+/* atalho: #quanto roda o "Quanto posso gastar?" depois da intro */
+if(location.hash==='#quanto') setTimeout(()=>startConversation('Quanto posso gastar?',3),7000);
+/* atalhos: #gastos roda a análise de gastos depois da intro; #plano segue até o plano (caixinha) */
+if(/^#(gastos|plano)$/.test(location.hash)) setTimeout(async()=>{ await startConversation(PH[2].q,2); if(location.hash==='#plano'){ await wait(700); startConversation('Faça um plano para me ajudar a economizar',21); } },7000);
+/* atalhos: #historico abre o histórico depois da intro; #busca abre a busca já com "Plano" */
+if(/^#(historico|busca)$/.test(location.hash)) setTimeout(()=>{ openHist(); if(location.hash==='#busca') setTimeout(()=>{ openSearch(); setTimeout(()=>{ $('#hsIn').value='Plano'; renderRes(); },600); },900); },7000);
+</script>
+
+</body></html>
