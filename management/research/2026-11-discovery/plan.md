@@ -40,7 +40,7 @@ Período do discovery no board: **16/11 a 18/12/2026**, com a análise depois do
 | Concorrentes | Que plataformas resolvem esse problema ou semelhante? | [A DEFINIR] (ver o benchmark, [#9](https://github.com/camimonteiro/trama/issues/9)) |
 | Cold Research | O que sabemos sobre o tópico? | "IA interfaces"; "Heurísticas de UX e IA"; "Ciclos de pesquisa e uso de dados quali e quanti" |
 
-O Cold Research corresponde ao desk research do [#8](https://github.com/camimonteiro/trama/issues/8). A análise fica em `management/analysis/` e vai ser linkada aqui quando estiver pronta.
+O Cold Research corresponde ao desk research do [#8](https://github.com/camimonteiro/trama/issues/8): [análise](../../analysis/2026-11-17-desk-research-data-informed-design.md) (PR [#33](https://github.com/camimonteiro/trama/pull/33)).
 
 ## Semana 2 — Plano de pesquisa (exploratória)
 | Bloco | Pergunta do board | Conteúdo |
