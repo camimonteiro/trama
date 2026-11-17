@@ -5,7 +5,7 @@ Itens exclusivos de uma ferramenta são marcados, por exemplo **[Claude-only]**.
 
 ## Projeto
 Trama (nome temporário): ferramenta de AI para designers que conecta craft e criação de interfaces a dados, métricas e embasamento de UX/design. Projeto final do curso Salto (Aprender Design). Time: Camille Monteiro e Lucas Sampaio (product designers); mentor: Danilo Campos.
-O trabalho é **assíncrono**. O único momento síncrono da dupla é a weekly (segundas, 21h–22h, até 2027-04-24). Assuntos que precisem de conversa vão para a pauta dela ([rituais](management/rituals/README.md)). Cronograma: [ADR-0010](management/decisions/ADR-0010-project-schedule.md).
+O trabalho é **assíncrono**. O único momento síncrono da dupla é a weekly (segundas, 21h–22h, até 2027-04-24). Assuntos que precisem de conversa vão para a pauta dela ([rituais](management/rituals/README.md)). Conversas assíncronas fora do GitHub ficam em threads na DM do Slack ([ADR-0012](management/decisions/ADR-0012-async-communication-slack-threads.md)); o que for decidido lá precisa ser registrado aqui. Cronograma: [ADR-0010](management/decisions/ADR-0010-project-schedule.md).
 
 ## Regras de idioma (ADR-0005)
 - **Português:** conteúdo de documentação (`management/`, `README`, decks, hub) e **descrições** de PR e issues.
@@ -26,7 +26,7 @@ O trabalho é **assíncrono**. O único momento síncrono da dupla é a weekly (
 4. PR: título `<type>: <Título em português>` (vira o commit da `main` no squash), descrição em português usando o template. Precisa de 1 aprovação humana (admins podem fazer o merge sem aprovação, ver ADR-0008; essa decisão é sempre humana).
 5. Antes do review humano, o agente revisa o diff com o checklist do template de PR.
 6. Squash merge. O deploy para o Pages é automático.
-7. **Nunca** faça push direto na `main`, force-push em branch compartilhada nem merge sem aprovação. Agentes **nunca** usam o bypass de admin por conta própria.
+7. **Nunca** faça push direto na `main`, force-push em branch compartilhada nem merge sem aprovação. Agentes **nunca** usam o bypass de admin por conta própria; humanos só o usam em emergências ([ADR-0013](management/decisions/ADR-0013-admin-bypass-emergencies-only.md)).
 
 ## Decisões e questões abertas
 - Questão sem resposta → adicionar linha em `management/open-questions.md` (`OQ-xxx`, status `open`).

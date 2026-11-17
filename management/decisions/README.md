@@ -18,10 +18,14 @@ Use o [`_template.md`](_template.md). Toda decisão costuma nascer de uma [quest
 | [ADR-0005](ADR-0005-language-policy.md) | Política de idioma | aceita (títulos de PR: ver ADR-0009) |
 | [ADR-0006](ADR-0006-project-management-github-projects.md) | Gestão no GitHub Projects | aceita |
 | [ADR-0007](ADR-0007-public-repo-no-license.md) | Repositório público, sem licença por ora | aceita |
-| [ADR-0008](ADR-0008-admin-merge-bypass.md) | Admin pode fazer merge de PR sem aprovação | aceita |
+| [ADR-0008](ADR-0008-admin-merge-bypass.md) | Admin pode fazer merge de PR sem aprovação | aceita (uso restrito: ver ADR-0013) |
 | [ADR-0009](ADR-0009-issue-and-pr-title-pattern.md) | Padrão de título de issues e PRs | aceita |
 | [ADR-0010](ADR-0010-project-schedule.md) | Cronograma do projeto e marcos até a entrega de 24/04/2027 | aceita |
 | [ADR-0011](ADR-0011-claude-primary-agent-model-agnostic.md) | Claude como agente principal, projeto agnóstico de modelo | aceita |
+| [ADR-0012](ADR-0012-async-communication-slack-threads.md) | Comunicação assíncrona em threads na DM do Slack | aceita |
+| [ADR-0013](ADR-0013-admin-bypass-emergencies-only.md) | Bypass de admin só em emergências | aceita |
+| [ADR-0014](ADR-0014-pr-review-local-testing.md) | Revisão de PR: teste local quando necessário | aceita |
+| [ADR-0015](ADR-0015-github-desktop-git-client.md) | GitHub Desktop como cliente Git do time | aceita |
 | [DDR-0001](DDR-0001-temporary-name.md) | Nome temporário: Trama | aceita |
 | [DDR-0002](DDR-0002-provisional-visual-identity.md) | Identidade visual provisória (terracota) | aceita |
 | [DDR-0003](DDR-0003-decks-html-gsap.md) | Decks em HTML + GSAP em `site/decks/<name>/` | aceita |
