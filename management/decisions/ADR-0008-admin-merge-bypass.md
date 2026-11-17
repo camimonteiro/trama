@@ -1,6 +1,6 @@
 # ADR-0008 — Admin pode fazer merge de PR sem aprovação
 
-- **Status:** aceita
+- **Status:** aceita (uso restrito a emergências pela [ADR-0013](ADR-0013-admin-bypass-emergencies-only.md))
 - **Data:** 2026-11-02
 - **Pessoas envolvidas:** Camille Monteiro
 - **Origem:** pedido da Camille após configurar a proteção da `main` ([ADR-0004](ADR-0004-git-workflow.md))
