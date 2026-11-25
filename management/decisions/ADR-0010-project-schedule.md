@@ -1,6 +1,6 @@
 # ADR-0010 — Cronograma do projeto e marcos até a entrega de 24/04/2027
 
-- **Status:** aceita
+- **Status:** substituída por [ADR-0017](ADR-0017-revised-project-schedule.md)
 - **Data:** 2026-11-02
 - **Pessoas envolvidas:** Camille Monteiro (com apoio de agente de AI)
 - **Origem:** [OQ-001](../open-questions.md), issue [#5](https://github.com/camimonteiro/trama/issues/5)
