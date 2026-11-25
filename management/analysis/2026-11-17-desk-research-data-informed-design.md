@@ -3,7 +3,7 @@
 - **Card:** [#8](https://github.com/camimonteiro/trama/issues/8) · Fase 1, Entender
 - **Responsável:** Camille Monteiro (com apoio de agente de AI para busca e leitura das fontes)
 - **Data:** 2026-11-17. Todas as fontes foram acessadas nessa data.
-- **Status:** primeira rodada. Pode ser ampliada depois do workshop de suposições ([#6](https://github.com/camimonteiro/trama/issues/6)).
+- **Status:** primeira rodada, revista em 2026-11-24 para seguir o [DDR-0004](../decisions/DDR-0004-lean-discovery-desk-research-prototyping.md) (discovery enxuto) e o [DDR-0005](../decisions/DDR-0005-mvp-scope-prototype-copilot.md) (escopo do MVP). Pode ser ampliada depois da consolidação das hipóteses ([#6](https://github.com/camimonteiro/trama/issues/6)).
 
 ## Pergunta de pesquisa
 Como designers usam (ou deixam de usar) dados, métricas, pesquisa e heurísticas para embasar decisões de interface hoje? Que barreiras aparecem?
@@ -13,6 +13,7 @@ Como designers usam (ou deixam de usar) dados, métricas, pesquisa e heurística
   - (A) ciclos de pesquisa e uso de dados quali e quanti;
   - (B) heurísticas de UX e AI;
   - (C) interfaces de AI e AI no trabalho de design.
+- **Fora do recorte:** a análise de concorrentes fica no benchmark ([#9](https://github.com/camimonteiro/trama/issues/9)). Necessidades do público e modelos de distribuição, que o DDR-0004 também inclui no discovery, ficam para outra rodada.
 - **Critério de fonte:** artigos da Nielsen Norman Group (NN/g), relatórios anuais de mercado, um artigo acadêmico revisado por pares e uma pesquisa brasileira divulgada pela imprensa. Toda fonte foi aberta e lida. Números aparecem só quando a fonte os publica.
 - **Cuidados de leitura:**
   - Maze e Figma vendem ferramentas para o mesmo público. Os relatórios deles são dados de pesquisa publicados por fornecedores, não estudos independentes.
@@ -105,22 +106,37 @@ Como designers usam (ou deixam de usar) dados, métricas, pesquisa e heurística
 - **[hipótese]** A dor pode estar mais em **interpretar e conectar** dados que já existem do que em coletar dados novos (F2, F1).
 - **[hipótese]** Para o público brasileiro, o uso individual e sem governança (F11) sugere uma adoção que começa pelo designer, não pela empresa. Isso tem implicações de privacidade e LGPD caso a ferramenta acesse dados do produto.
 
+### Ligação com o escopo do MVP ([DDR-0005](../decisions/DDR-0005-mvp-scope-prototype-copilot.md))
+O MVP é um copiloto de design que traz embasamento e entrega protótipos com histórico de versões. As hipóteses acima viram perguntas para o modelo inicial que vamos apresentar ao mentor (~14/12):
+
+| Achado | O que significa para o copiloto **[hipótese]** | Onde aparece na interface (direção do DDR-0005) |
+|---|---|---|
+| Pouca confiança na AI e precisão quase nunca publicada (F4, F8) | Cada insight mostra a fonte e o grau de certeza; o designer decide o que aplicar | Painel de outputs e insights |
+| Heurísticas pesquisadas são mais confiáveis que julgamento livre da AI (F8, F9) | As recomendações partem de diretrizes e heurísticas conhecidas e dizem qual regra aplicaram | Painel de insights; barra de inspeção |
+| Analytics sem plano de medição viram dado sem ação (F2); designers não sabem se a mudança funcionou (F1) | O copiloto ajuda a **interpretar** dados que já existem e a ligar cada versão a um objetivo e a uma métrica | Barra de inspeção (métricas) |
+| Uso de AI sem rastreabilidade ("shadow design", F11) | O histórico de versões registra **por que** cada mudança foi feita e com base em quê | Menu de versões e changelog |
+| Saída genérica e enviesada para convenções comuns (F5) | Começar por wireframes de média fidelidade com componentes genéricos é coerente com o que a AI faz bem; o craft fica com o designer | Protótipo no centro |
+
 ## Relação com o mapa de suposições ([#6](https://github.com/camimonteiro/trama/issues/6))
 Referência: [rascunho do mapa](2026-11-17-assumption-map.md). A evidência de fontes secundárias **não valida** nenhuma suposição sozinha, só aumenta ou reduz a confiança.
 
 | Suposição | Efeito do desk research |
 |---|---|
 | S-01: designers têm dificuldade de embasar decisões | **Ganha evidência** (fraca → moderada): F1, F2, F3 |
-| S-02: a dor principal é defender e negociar decisões | **Sem evidência** nas fontes; vai para as entrevistas |
+| S-02: a dor principal é defender e negociar decisões | **Sem evidência** nas fontes; vai para os testes de conceito (#20) |
 | S-03: há um público definível | **Indício**: designers de produto plenos e seniores, em empresas de tecnologia, são os mais engajados com AI no Brasil (F11) |
 | S-05: designers confiariam em AI se ela mostrar as fontes | **Ganha relevância e risco**: a confiança é baixa (F4), e mostrar as fontes aparece como necessidade em F6 e F7 |
-| S-07: há espaço de diferenciação | **Indício** a favor (ver implicações); precisa do benchmark (#9) |
+| S-07: há espaço de diferenciação | **Indício** a favor (ver implicações); a análise de concorrentes fica no benchmark (#9) |
 | S-10: existem fontes públicas confiáveis | **Indício** a favor, com limite: automatizar diretrizes só funciona para uma parte delas (F8) |
 | S-12: um modelo de mercado com contexto basta | **Risco maior**: os números de precisão de F8 e a queda de utilidade ao longo das iterações em F9 |
 
-## Lacunas para a pesquisa primária
-- Como a decisão de design é defendida diante de stakeholders, e onde o embasamento falta (S-02) → entrevistas ([#13](https://github.com/camimonteiro/trama/issues/13)).
-- Quais dados o designer brasileiro de fato acessa (analytics, pesquisa, NPS) e em que formato → entrevistas e survey ([#14](https://github.com/camimonteiro/trama/issues/14)).
+## Lacunas: o que validar com protótipos
+Pelo [DDR-0004](../decisions/DDR-0004-lean-discovery-desk-research-prototyping.md), as entrevistas e o survey (#11–#14) saíram desta etapa. As lacunas abaixo vão para os protótipos e os testes de conceito da fase Concept ([#20](https://github.com/camimonteiro/trama/issues/20)):
+- **Defender decisões (S-02):** mostrar o protótipo a designers e perguntar se o embasamento que ele traz ajudaria a defender uma decisão real diante de stakeholders.
+- **Confiança (S-05):** testar se mostrar a fonte e o grau de certeza muda a disposição de usar a recomendação.
+- **Dados acessíveis (S-11):** descobrir quais dados o designer de fato tem (analytics, pesquisa, NPS) e em que formato. Isso define o que o copiloto consegue ler. Se não der para responder nos testes de conceito, é candidata a voltar a entrevistas no Concept, como prevê o DDR-0004.
+
+Lacunas das próprias fontes:
 - Faltam dados recentes e locais sobre pesquisa quantitativa feita por designers: F1 é de 2018 e de fora do Brasil.
 - Faltam a amostra e a metodologia da pesquisa Môre/Ibpad (F11). Vale procurar o relatório original.
 - Os números completos do relatório da Figma (F4) estão atrás de um formulário.
