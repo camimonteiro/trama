@@ -12,6 +12,40 @@
 | 4. MVP | MVP refinado (protótipos, ver [DDR-0005](decisions/DDR-0005-mvp-scope-prototype-copilot.md)) | 2027-03-01 → 2027-03-19 | 3ª (semana de 2027-03-01) |
 | 5. Entrega final | Narrativa e apresentação (formato: [OQ-011](open-questions.md)) | 2027-03-22 → 2027-04-24 | — |
 
+## Critérios de saída
+Um marco termina quando todos os critérios dele estão cumpridos. Os mesmos critérios estão na descrição de cada [milestone](https://github.com/camimonteiro/trama/milestones). Quando mudar um, atualize o outro.
+
+### 0. Fundação (concluído)
+- Repositório e esteira configurados ([ADR-0004](decisions/ADR-0004-git-workflow.md))
+- Hub publicado no GitHub Pages
+- Deck de onboarding publicado no hub
+
+### 1. Descoberta
+- Público e problema registrados em DDR e no [brief](vision/brief.md) ([#18](https://github.com/camimonteiro/trama/issues/18))
+- Conceito inicial documentado em `management/analysis/` ([#16](https://github.com/camimonteiro/trama/issues/16))
+- Conceito apresentado ao mentor, com ata ([#21](https://github.com/camimonteiro/trama/issues/21))
+- Conceito refinado e hipóteses prontas para a pesquisa conceitual ([#36](https://github.com/camimonteiro/trama/issues/36))
+
+### 2. Pesquisa
+- Metodologia, roteiro, screener, consentimento e tags prontos ([#11](https://github.com/camimonteiro/trama/issues/11))
+- Protótipo navegável publicado para a pesquisa ([#37](https://github.com/camimonteiro/trama/issues/37))
+- Pesquisa conceitual feita com 6 pessoas do público definido, com notas anonimizadas ([#12](https://github.com/camimonteiro/trama/issues/12), [#20](https://github.com/camimonteiro/trama/issues/20))
+- Síntese com os principais insights e as hipóteses confirmadas ou refutadas ([#15](https://github.com/camimonteiro/trama/issues/15))
+
+### 3. Definição
+- Resultados da pesquisa apresentados ao mentor, com ata ([#38](https://github.com/camimonteiro/trama/issues/38))
+- Conceito revisado em `management/analysis/` e hipóteses do brief com status e evidência ([#39](https://github.com/camimonteiro/trama/issues/39))
+- Formato da ferramenta decidido ([OQ-010](open-questions.md), [#1](https://github.com/camimonteiro/trama/issues/1))
+- Estratégia e MVP definidos: escopo do MVP em DDR, distribuição, métricas de sucesso e evolução ([#19](https://github.com/camimonteiro/trama/issues/19))
+
+### 4. MVP
+- Estratégia e MVP apresentados ao mentor, com ata ([#40](https://github.com/camimonteiro/trama/issues/40))
+- Ajustes da mentoria aplicados, MVP publicado no hub (`/app/`) e changelog atualizado ([#41](https://github.com/camimonteiro/trama/issues/41))
+
+### 5. Entrega final
+- Narrativa e apresentação prontas no formato exigido pelo curso ([A DEFINIR], [OQ-011](open-questions.md))
+- Projeto entregue até 2027-04-24
+
 ## Etapas por semana
 | Semana | Datas | Etapa |
 |---|---|---|
