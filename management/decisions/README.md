@@ -26,6 +26,9 @@ Use o [`_template.md`](_template.md). Toda decisão costuma nascer de uma [quest
 | [ADR-0013](ADR-0013-admin-bypass-emergencies-only.md) | Bypass de admin só em emergências | aceita |
 | [ADR-0014](ADR-0014-pr-review-local-testing.md) | Revisão de PR: teste local quando necessário | aceita |
 | [ADR-0015](ADR-0015-github-desktop-git-client.md) | GitHub Desktop como cliente Git do time | aceita |
+| [ADR-0016](ADR-0016-mandatory-pr-review-trial.md) | Review de PR obrigatória, em caráter de teste | aceita (em teste) |
 | [DDR-0001](DDR-0001-temporary-name.md) | Nome temporário: Trama | aceita |
 | [DDR-0002](DDR-0002-provisional-visual-identity.md) | Identidade visual provisória (terracota) | aceita |
 | [DDR-0003](DDR-0003-decks-html-gsap.md) | Decks em HTML + GSAP em `site/decks/<name>/` | aceita |
+| [DDR-0004](DDR-0004-lean-discovery-desk-research-prototyping.md) | Discovery enxuto: desk research e prototipação rápida | aceita |
+| [DDR-0005](DDR-0005-mvp-scope-prototype-copilot.md) | Escopo do MVP: copiloto de design focado em protótipos | aceita |
