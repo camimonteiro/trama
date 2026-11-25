@@ -8,7 +8,7 @@ Resumo das orientações iniciais do curso ("Projeto Final Salto Design de Inter
 | 2026-10-09 | Definir a dupla, a ideia inicial e uma sugestão de mentor, e registrar na planilha do curso | PDF do curso | feito: Camille + Lucas, mentor Danilo Campos |
 | 2027-04-24 | Entrega final do projeto | informada pela Camille (não consta no PDF) | — |
 
-As datas intermediárias do projeto foram planejadas pelo time, não vêm do curso: veja o [ADR-0010](../decisions/ADR-0010-project-schedule.md) e o [roadmap](../roadmap.md).
+As datas intermediárias do projeto foram planejadas pelo time, não vêm do curso: veja o [ADR-0017](../decisions/ADR-0017-revised-project-schedule.md) e o [roadmap](../roadmap.md).
 
 ## O que o curso espera
 - O projeto acompanha toda a formação e deve aplicar o que o curso ensina num desafio relevante para a trajetória da dupla.

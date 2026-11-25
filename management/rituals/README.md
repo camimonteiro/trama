@@ -11,5 +11,5 @@ Atas de mentoria, weeklies e retros: um arquivo por encontro, `YYYY-MM-DD-type.m
 
 ## Cadência
 - **Weekly** (Camille e Lucas): toda segunda-feira, das 21h às 22h, de 2026-11-02 até o fim do projeto (2027-04-24). Para revisar o board, os bloqueios e as decisões pendentes.
-- **Mentoria** (regra do curso): 3 encontros de 1 hora com o Danilo, agendados pela dupla. Datas-alvo no [roadmap](../roadmap.md): ~2026-12-22, ~2027-02-10 e ~2027-04-09. Levar pauta e material com antecedência.
+- **Mentoria** (regra do curso): 3 encontros de 1 hora com o Danilo, agendados pela dupla. Uma por bloco, nas semanas de 2026-12-07, 2027-02-01 e 2027-03-01 ([roadmap](../roadmap.md), [ADR-0017](../decisions/ADR-0017-revised-project-schedule.md)). Levar pauta e material com antecedência.
 - **Retro** (proposta do time): ao fim de cada marco, dentro da weekly.

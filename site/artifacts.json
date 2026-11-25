@@ -39,6 +39,13 @@
     "type": "decision",
     "date": "2026-11-02",
     "href": "https://github.com/camimonteiro/trama/blob/main/management/decisions/ADR-0010-project-schedule.md",
-    "description": "Marcos até a entrega final de 24/04/2027 e resumo das orientações do curso para o projeto final."
+    "description": "Primeiro cronograma e resumo das orientações do curso para o projeto final. Substituído pelo ADR-0017."
+  },
+  {
+    "title": "Novo cronograma do projeto",
+    "type": "decision",
+    "date": "2026-11-24",
+    "href": "https://github.com/camimonteiro/trama/blob/main/management/decisions/ADR-0017-revised-project-schedule.md",
+    "description": "Discovery, Research, Definition e MVP até a entrega de 24/04/2027, com uma mentoria por bloco. Substitui o ADR-0010."
   }
 ]
